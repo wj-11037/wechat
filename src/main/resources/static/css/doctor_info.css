@@ -1,0 +1,51 @@
+.text-align-c .colorBtn {
+	color: #fff;
+	background: #00ac9c;
+}
+
+.ui-body h3 {
+	text-align: center;
+}
+
+.ui-body li {
+	font-weight: bold;
+}
+
+.ui-body .red {
+	color: #ffa81f;
+}
+
+.ui-body .ui-body-b {
+	background: #fff;
+	border-color: #fff;
+	color: grey;
+	text-shadow: none;
+}
+
+.ui-listview>li h2 {
+	margin: 0;
+	font-size: 16px;
+}
+
+.ui-listview>li p {
+	margin: 5px 0 0 0;
+}
+
+.ui-listview>.ui-li-has-icon>.ui-btn>img:first-child {
+	max-width: 2em;
+	max-height: 2em;
+	top: 0.35em;
+	left: 0.35em;
+}
+
+.to-left {
+	background: #0e9c8a;
+	border-color: #0e9c8a;
+	color: #fff;
+	margin-left: 20px;
+	padding: 5px 10px;
+	text-shadow: none;
+	font-weight: normal;
+	border-radius: 4px;
+	font-size: 14px;
+}

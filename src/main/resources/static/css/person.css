@@ -1,0 +1,72 @@
+.ui-body-b{
+	background-color: #fff;
+	border-color: #e4e1e1;
+	color: #d01414;
+	text-shadow: none;
+	border:none;
+}
+.c-img img{
+	max-width: 100%;
+}
+.rechargeBtn{
+	display: inline-block;
+	padding: 6px 12px;
+	margin-top: 10px;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 1.42857143;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	-ms-touch-action: manipulation;
+	touch-action: manipulation;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	background-image: none;
+	border: 1px solid transparent;
+	border-radius: 4px;
+}
+.to-person  image{
+	left: 8px;
+	top: 9px;
+	max-height: 5.2em;
+	max-width: 5.2em;
+	border-radius: 50%;
+}
+.entry-button-wrap {
+	display: inline-block;
+	position: fixed;
+	right: 15px;
+	bottom: 198px!important;
+	z-index: 9999;
+	padding-left: 10px;
+}
+.entry-button {
+	text-decoration: none!important;
+	width: 44px;
+	height: 90px;
+	box-shadow: 0 6px 12px 0 rgba(0,0,0,.15);
+	background-color: #fff;
+	text-align: center;
+	display: inline-block;
+	cursor: pointer;
+}
+.entry-button .button-background {
+	color: #1b9a13;
+	display: block;
+	margin: 15px auto 10px;
+	font-size: 34px;
+	text-align: center;
+	line-height: 22px;
+}
+.entry-button .button-text {
+	display: inline-block;
+	width: 14px;
+	font-size: 14px;
+	color: #1b9a13;
+	line-height: 17px;
+	text-decoration: none;
+}

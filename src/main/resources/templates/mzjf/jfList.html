@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>门诊缴费列表</title>
+    <link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+    <link rel="stylesheet" th:href="@{/css/department.css}">
+</head>
+<body ontouchstart>
+
+<header class='demos-header'>
+    <h1 class="demos-title">缴费列表</h1>
+</header>
+<div class="weui-form-preview">
+
+</div>
+
+
+<div class="weui-msg" style="display: none" id="msg">
+    <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+    <div class="weui-msg__text-area">
+        <h2 class="weui-msg__title">暂无数据</h2>
+        <p class="weui-msg__desc"></p>
+    </div>
+    <div class="weui-msg__opr-area">
+        <p class="weui-btn-area">
+            <a href="javascript:history.go(-1);" class="weui-btn weui-btn_default">返回</a>
+        </p>
+    </div>
+    <div class='demos-content-padded'>
+        <div class="weui-footer">
+            <p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/appjs/lib/jquery-2.1.4.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/md5.js}"></script>
+<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+<script th:src="@{/js/appjs/public.js}"></script>
+<script>
+    //var api_url = 'http://jdm.vipgz2.idcfengye.com';
+    var api_url = '//lxyy.bdlxyy.cn';
+
+    var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+    $(function () {
+        FastClick.attach(document.body);
+        $.showLoading();
+        var timeStamp = parseInt(new Date().getTime() / 1000);
+        var sign = hex_md5(accountid + pass + key + timeStamp);
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp": timeStamp,
+            "method": 1
+        };
+        $.ajax({
+            url: api_url + '/hospital/mzjf/service.do',
+            data: JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                $.hideLoading();
+                if (data.code == 0) {
+                    if(data.data.length <=0){
+                        $(".jqm-demos").hide();
+                        $(".weui-msg__title").html(data.msg);
+                        $("#msg").show();
+                        return;
+                    }
+                    var html = '';
+                    if (data.data.Item instanceof Array) {
+                        $.each(data.data.Item, function (i, item) {
+                        	//0：处方 1：化验2：检查
+                        	 var myTypeTxt = '未知';
+                             if (item.MyType == 0) {
+                            	 myTypeTxt = '处方';
+                             }
+                             if (item.MyType == 1) {
+                            	 myTypeTxt = '化验';
+                             }
+                             if (item.MyType == 2) {
+                            	 myTypeTxt = '检查';
+                             }
+                            
+                            html += '<div class="weui-form-preview__bd">\n' +
+                                '\t\t<div class="weui-form-preview__item">\n' +
+                                '\t\t\t<label class="weui-form-preview__label">处方序号</label>\n' +
+                                '\t\t\t<span class="weui-form-preview__value">' + item.SqMzDocPatientItemNum + '</span>\n' +
+                                '\t\t</div>\n' +
+                                '\t\t<div class="weui-form-preview__item">\n' +
+                                '\t\t\t<label class="weui-form-preview__label">处方类型</label>\n' +
+                                '\t\t\t<span class="weui-form-preview__value">'+myTypeTxt+'</span>\n' +
+                                '\t\t</div>\n' +
+                                '\t\t<div class="weui-form-preview__item">\n' +
+                                '\t\t\t<label class="weui-form-preview__label">就诊科室</label>\n' +
+                                '\t\t\t<span class="weui-form-preview__value">' + item.Departments +'</span>\n' +
+                                '\t\t</div>\n' +
+                                '\t\t<div class="weui-form-preview__item">\n' +
+                                '\t\t\t<label class="weui-form-preview__label">医生</label>\n' +
+                                '\t\t\t<span class="weui-form-preview__value">' + item.Billing +'</span>\n' +
+                                '\t\t</div>\n' +
+                                '\t\t<div class="weui-form-preview__item">\n' +
+                                '\t\t\t<label class="weui-form-preview__label">病人登记号</label>\n' +
+                                '\t\t\t<span class="weui-form-preview__value">'+ item.SqMzDocPatientId +'</span>\n' +
+                                '\t\t</div>\n' +
+                                '\t\t<div class="weui-form-preview__ft">\n' +
+                                '\t\t<a class="weui-form-preview__btn weui-form-preview__btn_primary" href="' + api_url + '/hospital/mzjf/jfDetail?myType=' + $.trim(item.MyType) + '&sqMzDocPatientId=' + $.trim(item.SqMzDocPatientId) + '&sqMzDocPatientItemNum=' + $.trim(item.SqMzDocPatientItemNum) + '">查看详情</a>\n' +
+                                '\t\t</div>\n' +
+                                '\t</div>';
+                        })
+                    } else {
+                    	
+                    	//0：处方 1：化验2：检查
+                   		 var myTypeTxt = '未知';
+                        if (data.data.Item.MyType == 0) {
+                       	 myTypeTxt = '处方';
+                        }
+                        if (data.data.Item.MyType == 1) {
+                       	 myTypeTxt = '化验';
+                        }
+                        if (data.data.Item.MyType == 2) {
+                       	 myTypeTxt = '检查';
+                        }
+                        html += '<div class="weui-form-preview__bd">\n' +
+                            '\t\t<div class="weui-form-preview__item">\n' +
+                            '\t\t\t<label class="weui-form-preview__label">处方序号</label>\n' +
+                            '\t\t\t<span class="weui-form-preview__value">' + data.data.Item.SqMzDocPatientItemNum + '</span>\n' +
+                            '\t\t</div>\n' +
+                            '\t\t<div class="weui-form-preview__item">\n' +
+                            '\t\t\t<label class="weui-form-preview__label">处方类型</label>\n' +
+                            '\t\t\t<span class="weui-form-preview__value">'+ myTypeTxt +'</span>\n' +
+                            '\t\t</div>\n' +
+                            '\t\t<div class="weui-form-preview__item">\n' +
+                            '\t\t\t<label class="weui-form-preview__label">科室</label>\n' +
+                            '\t\t\t<span class="weui-form-preview__value">' + data.data.Item.Departments +'</span>\n' +
+                            '\t\t</div>\n' +
+                            '\t\t<div class="weui-form-preview__item">\n' +
+                            '\t\t\t<label class="weui-form-preview__label">医生</label>\n' +
+                            '\t\t\t<span class="weui-form-preview__value">' + data.data.Item.Billing +'</span>\n' +
+                            '\t\t</div>\n' +
+                            '\t\t<div class="weui-form-preview__item">\n' +
+                            '\t\t\t<label class="weui-form-preview__label">病人登记号</label>\n' +
+                            '\t\t\t<span class="weui-form-preview__value">'+ data.data.Item.SqMzDocPatientId +'</span>\n' +
+                            '\t\t</div>\n' +
+                            '\t\t<div class="weui-form-preview__ft">\n' +
+                            '\t\t<a class="weui-form-preview__btn weui-form-preview__btn_primary" href="' + api_url + '/hospital/mzjf/jfDetail?myType=' + $.trim(data.data.Item.MyType) + '&sqMzDocPatientId=' + $.trim(data.data.Item.SqMzDocPatientId) + '&sqMzDocPatientItemNum=' + $.trim(data.data.Item.SqMzDocPatientItemNum) + '">查看详情</a>\n' +
+                            '\t\t</div>\n' +
+                            '\t</div>';
+                    }
+                    $(".weui-form-preview").html(html);
+                } else {
+                    layer.open({
+                        content: data.msg
+                        , skin: 'msg'
+                        , time: 2 //2秒后自动关闭
+                    });
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>门诊缴费处理中</title>
+    <link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+</head>
+<body ontouchstart>
+<header class='demos-header'>
+    <h1 class="demos-title">门诊缴费</h1>
+</header>
+<div class="weui-msg">
+    <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+    <div class="weui-msg__text-area">
+        <h2 class="weui-msg__title">请等待</h2>
+        <p class="weui-msg__desc"></p>
+    </div>
+    <div class="weui-msg__extra-area weui-footer_fixed-bottom">
+        <div class="weui-footer">
+            <p class="weui-footer__text">Copyright © 2020-2030 蠡县人民医院</p>
+        </div>
+    </div>
+</div>
+
+
+<script th:src="@{/js/appjs/lib/jquery-2.1.4.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/md5.js}"></script>
+<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+<script th:src="@{/js/appjs/public.js}"></script>
+<script>
+        var api_url = '//lxyy.bdlxyy.cn';
+        var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+        var orderCode  = decodeURI(getQueryVariable("orderCode"));//订单号
+        var amount  = decodeURI(getQueryVariable("amount"));//充值金额
+        
+        var sqMzDocPatientId = decodeURI(getQueryVariable("sqMzDocPatientId"));//
+        var sqMzDocPatientItemNum = decodeURI(getQueryVariable("sqMzDocPatientItemNum"));//
+        var myType = decodeURI(getQueryVariable("myType"));//
+        
+        var interval = setInterval("loading()", 3000);
+
+        $(function () {
+            $.showLoading();
+        })
+
+        //获取充值结果
+        function loading() {
+        	var timeStamp = parseInt(new Date().getTime() / 1000);
+            var sign = hex_md5(accountid + pass + key + timeStamp);
+            var postData = {
+                "sign": sign,
+                "accountid": 1,
+                "timeStamp": timeStamp,
+                "method": 10,
+                "orderCode":orderCode
+            };
+            $.ajax({
+                url: api_url + '/common/service.do',
+                data: JSON.stringify(postData),
+                contentType: "application/json;charset=utf-8",//这个参数也是header参数
+                type: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.code == 0) {
+                    	clearInterval(interval);//停止轮询 
+                       //执行缴费
+                       toPay();
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            })
+        }
+        
+        //执行缴费
+        function toPay(){
+        	var timeStamp = parseInt(new Date().getTime() / 1000);
+            var sign = hex_md5(accountid + pass + key + timeStamp);
+            var postData = {
+                "sign": sign,
+                "accountid": 1,
+                "timeStamp": timeStamp,
+                "method": 3,
+                "data":[
+                	{
+                		"myType":myType,
+                        "sqMzDocPatientId":sqMzDocPatientId,
+                        "sqMzDocPatientItemNum":sqMzDocPatientItemNum
+                	}
+                 ]
+            };
+            $.ajax({
+                url: api_url + '/hospital/mzjf/service.do',
+                data: JSON.stringify(postData),
+                contentType: "application/json;charset=utf-8",//这个参数也是header参数
+                type: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.code == 0) {
+                    	//跳转到缴费列表
+                        location.href= api_url+"/hospital/mzjf/jfList";
+                    } else {
+                        layer.open({
+                            content: data.msg
+                            , skin: 'msg'
+                            , time: 2 //2秒后自动关闭
+                        });
+                        
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            })
+        }
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>输入住院号</title>
+    <link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+</head>
+<body ontouchstart>
+
+<header class='demos-header'>
+    <h1 class="demos-title">住院号</h1>
+</header>
+
+<div class="weui-cells__title">请先输入住院号，即可查询住院消费的流水记录，本记录仅供参考，请以医院的医务系统为准（数据更新不同步或延迟）</div>
+<div class="weui-cells weui-cells_form">
+    <div class="weui-cell weui-cell_vcode">
+        <div class="weui-cell__bd">
+            <input class="weui-input" type="number" name="zyh" id="zyh" value="" placeholder="请在此处输入住院号">
+        </div>
+    </div>
+    <div class="weui-cell weui-cell_vcode">
+        <div class="weui-cell__bd">
+            <input class="weui-input" type="text" name="startDate" id="startDate" value="" placeholder="请点击此处选择开始日期">
+        </div>
+    </div>
+    <div class="weui-cell weui-cell_vcode">
+        <div class="weui-cell__bd">
+            <input class="weui-input" type="text" name="endDate" id="endDate" value="" placeholder="请点击此处选择结束日期">
+        </div>
+    </div>
+    <div class="weui-btn-area">
+        <a class="weui-btn weui-btn_primary rechargeBtn" href="javascript:doInputZyh();">确 认</a>
+    </div>
+</div>
+<!--<div class="weui-cells__tips"><i class="weui-icon-info-circle"></i>如因个人原因，未核实住院人身份信息，而导致充值错误，请联系医院的信息科，电话：xxxxxx</div>-->
+
+<div class='demos-content-padded weui-footer_fixed-bottom'>
+    <div class="weui-footer">
+        <p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+    </div>
+</div>
+
+<script th:src="@{/js/appjs/jquery.min.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/md5.js}"></script>
+<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+<script th:src="@{/js/appjs/public.js}"></script>
+<script>
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+
+    //
+    $("#startDate").calendar({
+        dateFormat: 'yyyy-mm-dd',
+        onChange: function (p, values, displayValues) {
+            console.log(values[0]);
+            $("#startDate").val(values[0]);
+            console.log(displayValues[0]);
+        }
+    });
+    $("#endDate").calendar({
+        dateFormat: 'yyyy-mm-dd',
+        onChange: function (p, values, displayValues) {
+            console.log(values[0]);
+            $("#endDate").val(values[0]);
+            console.log(displayValues[0]);
+        }
+    });
+    function doInputZyh() {
+        var zyh = $("#zyh").val();
+        var startDate = $("#startDate").val();
+        var endDate = $("#endDate").val();
+        
+        if (zyh == "") {
+            layer.open({
+                content: '请输入住院号'
+                , skin: 'msg'
+                , time: 2 //2秒后自动关闭
+            });
+            return false;
+        }
+        if (startDate == "") {
+            layer.open({
+                content: '请选择开始日期'
+                , skin: 'msg'
+                , time: 2 //2秒后自动关闭
+            });
+            return false;
+        }
+        if (endDate == "") {
+            layer.open({
+                content: '请选择结束日期'
+                , skin: 'msg'
+                , time: 2 //2秒后自动关闭
+            });
+            return false;
+        }
+        
+        
+        location.href = api_url + '/hospital/query/zyfyls?zyh=' + zyh+"&startDate="+startDate+"&endDate="+endDate;
+    }
+
+    $(function () {
+        FastClick.attach(document.body);
+    })
+</script>
+</body>
+</html>

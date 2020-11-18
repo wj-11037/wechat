@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>绑定就诊人</title>
+</head>
+<body>
+	<form id="binding">
+		<!-- 循环卡号列表 -->
+		<div th:each="pl: ${patientList}">
+			卡号： <input type="checkbox" name="patient" th:value="${pl.cardNo}"
+				th:text="${pl.cardNo}"></br> <input type="checkbox"
+				name="patient" th:value="${pl.idNo}" th:text="${pl.idNo}"></br> <input
+				type="checkbox" name="patient" th:value="${pl.userName}"
+				th:text="${pl.userName}"></br>
+		</div>
+
+		<!-- 提交 -->
+		<div>
+			<button type="button" onclick="commitBinding()">提交绑定</button>
+		</div>
+	</form>
+	<script type="text/javascript" th:src="@{/js/appjs/binding.js}"></script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title></title>
+<link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+<link rel="stylesheet"
+	th:href="@{/css/themes/default/jquery.mobile-1.4.5.min.css}">
+<link rel="stylesheet" th:href="@{/css/public.css}">
+<link rel="stylesheet" th:href="@{/css/department.css}">
+</head>
+<body>
+
+	<div data-role="page" class="jqm-demos" data-quicklinks="true">
+		<div role="main" class="ui-content">
+			<div class="ui-body ui-corner-all">
+				<ul data-role="listview" data-count-theme="b" data-inset="true"class="to-report">
+					
+				</ul>
+			</div>
+		</div>
+		<!-- /content -->
+
+		<div data-role="panel" class="jqm-navmenu-panel" data-position="left"
+			data-display="overlay" data-theme="a">
+			<ul class="jqm-list ui-alt-icon ui-nodisc-icon">
+				<li data-filtertext="demos homepage" data-icon="home"><a
+					href=".././">首页</a></li>
+			</ul>
+		</div>
+		<!-- /jqm-navmenu-panel -->
+	</div>
+	<!-- /page -->
+
+	<script th:src="@{/js/appjs/jquery.min.js}"></script>
+	<script th:src="@{/js/appjs/jquery.mobile-1.4.5.min.js}"></script>
+	<script th:src="@{/js/appjs/md5.js}"></script>
+	<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+	<script th:src="@{/js/appjs/public.js}"></script>
+	<script>
+    //var api_url = 'http://jdm.vipgz2.idcfengye.com';
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh',pass = 'wxgzh@dmin',key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+   
+   
+    var nIID  = decodeURI(getQueryVariable("nIID"));//1.仪器序号
+    var nDID  = decodeURI(getQueryVariable("nDID"));//2.样本号
+    var nTDID  = decodeURI(getQueryVariable("nTDID"));//3.检验医生ID
+    var nSDID  = decodeURI(getQueryVariable("nSDID"));//4.送检医生ID
+    var dDate  = decodeURI(getQueryVariable("dDate"));//5.日期
+    var nSID  = decodeURI(getQueryVariable("nSID"));//6.样本号
+    
+    
+    $(function(){
+        $.mobile.loading( "show");
+        var timeStamp = parseInt(new Date().getTime()/1000);
+        var sign = hex_md5(accountid+pass+key+timeStamp);
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp":timeStamp,
+            "method": 1,
+            "nIID":nIID,
+            "nDID":nDID,
+            "nTDID":nTDID,
+            "nSDID":nSDID,
+            "dDate":dDate,
+            "nSID":nSID
+        };
+        $.ajax({
+            url:api_url+'/hospital/lis/service.do',
+            data:JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type:'POST',
+            dataType:'json',
+            success:function (data) {
+                $.mobile.loading( "hide");
+                if(data.code == 0){
+                	var html = '';
+                	 for (var i in data.data){
+                		 html += 
+                          	'<li>送检医生 <span class="ui-li-count">' +data.data[i].sDoctor + '</span></li>\n' +
+                          	'<li>检验医生<span class="ui-li-count">' + data.data[i].tDoctor + '</span></li>\n' +
+                          	'<li>科室<span class="ui-li-count">' + data.data[i].dept+ '</span></li>\n' +         	
+                          	'<li>检验类型<span class="ui-li-count">' + data.data[i].iType + '</span></li>\n' +
+                          	'<li>fOD值<span class="ui-li-count">' + data.data[i].fOD + '</span></li>\n' +
+                          	'<li>浓度值类型<span class="ui-li-count">' + data.data[i].bCType+ '</span></li>\n' + 
+                             '<li>浓度值(数字)<span class="ui-li-count">' + data.data[i].fConc + '</span></li>\n' +                    
+                             '<li>浓度值(字符)<span class="ui-li-count">' + data.data[i].sConc + '</span></li>\n' +
+                             '<li>结果<span class="ui-li-count">' + data.data[i].sResult + '</span></li>\n' +
+                             '<li>fCutOff值<span class="ui-li-count">' + data.data[i].fCutOff + '</span></li>\n' +
+                             '<li>结果是否异常<span class="ui-li-count">' + data.data[i].bAbnormal + '</span></li>\n' +
+                             '<li>异常符号<span class="ui-li-count">' + data.data[i].sAbnormal + '</span></li>\n' +
+                             '<li>检验项目名称<span class="ui-li-count">' + data.data[i].sName + '</span></li>\n' +
+                             '<li>单位<span class="ui-li-count">' + data.data[i].sUnit + '</span></li>\n' +
+                             '<li>正常值范围<span class="ui-li-count">' + data.data[i].normalFR + '</span></li>\n' +
+                             '<hr/>';
+                     }
+	                $(".to-person").html(html);
+	                $(".to-person").listview("refresh");
+                }else{
+                    layer.open({
+                        content: data.msg
+                        ,skin: 'msg'
+                        ,time: 2 //2秒后自动关闭
+                    });
+                    //获取住院信息失败后跳到输入住院号页面
+                    location.href=api_url+"/hospital/query/inputzyh";
+                }
+            },
+            error:function (error) {
+                console.log(error);
+            }
+        })
+    })
+   
+    
+    
+</script>
+</body>
+</html>

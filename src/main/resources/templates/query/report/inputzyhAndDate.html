@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>输入住院号</title>
+	<link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+	<link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+	<link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+	<link rel="stylesheet" th:href="@{/css/public.css}">
+</head>
+<body ontouchstart>
+
+<header class='demos-header'>
+	<h1 class="demos-title">检验报告（住院）</h1>
+</header>
+<div class="weui-cells__title">请输入住院号并选择要查询的检验报告日期，不输入则默认查3个月，<span class="timeTips"></span></div>
+<div class="weui-cells weui-cells_form">
+	<div class="weui-cell">
+		<div class="weui-cell__bd">
+			<input class="weui-input" type="text" name="zyh" id="zyh" value=""  placeholder="请在此处输入住院号">
+		</div>
+	</div>
+	<div class="weui-cell">
+		<div class="weui-cell__bd">
+			<input class="weui-input" id="date" name="date" type="text" placeholder="请在此处输入您要查询的日期">
+		</div>
+	</div>
+	<div class='demos-content-padded'>
+		<a href="javascript:doInputZyh();" class="weui-btn weui-btn_primary chooseDateBtn">确 认</a>
+	</div>
+</div>
+<div id="inline-calendar"></div>
+
+<div class='demos-content-padded weui-footer_fixed-bottom'>
+	<div class="weui-footer">
+		<p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+	</div>
+</div>
+
+
+	<script th:src="@{/js/appjs/lib/jquery-2.1.4.js}"></script>
+	<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+	<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+	<script th:src="@{/js/appjs/md5.js}"></script>
+	<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+	<script th:src="@{/js/appjs/public.js}"></script>
+	
+	
+	<script>
+        var api_url = '//lxyy.bdlxyy.cn';
+        var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+        var showDateDom = $('#date');
+     	// 初始化时间
+        var timestamp = (new Date()).getTime()-3600*24*1000*90;
+        var now = new Date(timestamp);
+        var nowYear = now.getFullYear();
+        var nowMonth = now.getMonth() + 1;
+        var nowDate = now.getDate();
+        nowMonth = nowMonth < 10 ? '0' + nowMonth : nowMonth;
+        nowDate = nowDate < 10 ? '0' + nowDate : nowDate;
+        
+    	
+    	var maxTimestamp = (new Date()).getTime()+3600*24*1000*0;
+        var max = new Date(maxTimestamp);
+        var maxYear = max.getFullYear();
+        var maxMonth = max.getMonth() + 1;
+        var maxDate = max.getDate();
+        maxMonth = maxMonth < 10 ? '0' + maxMonth : maxMonth;
+        maxDate = maxDate < 10 ? '0' + maxDate : maxDate;
+    	$(".timeTips").html(nowYear + '-' + nowMonth + '-' + nowDate+'至'+maxYear+'-'+maxMonth+'-'+maxDate);
+        
+    	showDateDom.attr('data-year', maxYear);
+        showDateDom.attr('data-month', maxMonth);
+        showDateDom.attr('data-date', maxDate);
+        showDateDom.val(maxYear+'-'+maxMonth+'-'+maxDate);
+    	
+        $("#date").calendar({
+            dateFormat:'yyyy-mm-dd',
+            onChange: function (p, values, displayValues) {
+                console.log(values[0]);
+                $("#date").val(values[0]);
+                console.log(displayValues[0]);
+            }
+        });
+        function doInputZyh() {
+            var zyh = $("#zyh").val();
+            var date = $("#date").val();
+            
+            if(zyh==""){
+                layer.open({
+                    content: '请输入住院号'
+                    , skin: 'msg'
+                    , time: 2 //2秒后自动关闭
+                });
+                return false;
+            }
+            if(date==""){
+                layer.open({
+                    content: '请选择日期'
+                    , skin: 'msg'
+                    , time: 2 //2秒后自动关闭
+                });
+                return false;
+            }
+           location.href= api_url+'/hospital/lis/zyReportQuntity?zyh='+zyh+"&date="+date;
+           //location.href= api_url+'/hospital/lis/zyReportQuntity?zyh='+zyh+"&date="+date;
+        }
+    </script>
+</body>
+</html>

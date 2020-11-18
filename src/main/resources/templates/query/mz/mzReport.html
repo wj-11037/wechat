@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title></title>
+<link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+<link rel="stylesheet"
+	th:href="@{/css/themes/default/jquery.mobile-1.4.5.min.css}">
+<link rel="stylesheet" th:href="@{/css/public.css}">
+<link rel="stylesheet" th:href="@{/css/department.css}">
+</head>
+<body>
+
+	<div data-role="page" class="jqm-demos" data-quicklinks="true">
+		<div role="main" class="ui-content">
+			<div class="ui-body ui-corner-all">
+				<ul data-role="listview" class="report-list">
+					
+				</ul>
+			</div>
+			
+			<div class="ui-field-contain text-align-c">
+					<!-- 日期 -->
+					<input type="date" id="date">
+					<!-- 确认 -->
+					<button onclick="confirm()"
+						class="show-page-loading-msg colorBtn chooseDateBtn"
+						data-textonly="false" data-textvisible="false" data-msgtext=""
+						data-inline="true">确认</button>
+			</div>
+		</div>
+		<!-- /content -->
+
+		<div data-role="panel" class="jqm-navmenu-panel" data-position="left"
+			data-display="overlay" data-theme="a">
+			<ul class="jqm-list ui-alt-icon ui-nodisc-icon">
+				<li data-filtertext="demos homepage" data-icon="home"><a
+					href=".././">首页</a></li>
+			</ul>
+		</div>
+		<!-- /jqm-navmenu-panel -->
+	</div>
+	<!-- /page -->
+
+	<script th:src="@{/js/appjs/jquery.min.js}"></script>
+	<script th:src="@{/js/appjs/jquery.mobile-1.4.5.min.js}"></script>
+	<script th:src="@{/js/appjs/md5.js}"></script>
+	<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+	<script th:src="@{/js/appjs/public.js}"></script>
+	<script>
+    //var api_url = 'http://jdm.vipgz2.idcfengye.com';
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh',pass = 'wxgzh@dmin',key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+   
+   
+    function confirm(){
+        $.mobile.loading( "show");
+        var timeStamp = parseInt(new Date().getTime()/1000);
+        var sign = hex_md5(accountid+pass+key+timeStamp);
+        
+       
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp":timeStamp,
+            "method": 1,
+            "date":$("#date").value(),
+            "type":"mz"
+            
+        };
+        $.ajax({
+            url:api_url+'/hospital/lis/service.do',
+            data:JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type:'POST',
+            dataType:'json',
+            success:function (data) {
+                $.mobile.loading( "hide");
+                if(data.code == 0){
+                	var html = '';
+                    for (var i in data.data){
+                        html += '<li><a target="_top" href="'+api_url+'/hospital/lis/mzReportDetail?nIID='+$.trim(data.data[i].nIID)
+                        +'&nDID='+$.trim(data.data[i].nDID)+'
+                        +'&nTDID='+$.trim(data.data[i].nTDID)+'
+                        +'&nSDID='+$.trim(data.data[i].nSDID)+'
+                        +'&dDate='+$.trim(data.data[i].dDate)+'
+                        +'&nSID='+$.trim(data.data[i].nSID)+'
+                        +'&sPID='+$.trim(data.data[i].sPID)+'">'
+                        +'<p>'+data.data[i].sPName+'</p>\n' 
+                        +'<p>'+data.data[i].nIID+'</p>\n' 
+                        +'<p>'+data.data[i].nSID+'</p>\n' 
+                        +'</a></li>';
+                    }
+                    $(".report-list").html(html);
+                    $(".report-list").listview("refresh");
+                }else{
+                   
+                }
+            },
+            error:function (error) {
+                console.log(error);
+            }
+        })
+    }
+   
+    
+    
+</script>
+</body>
+</html>

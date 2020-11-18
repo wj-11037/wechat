@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>检验报告</title>
+<link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+<link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+<link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+<link rel="stylesheet" th:href="@{/css/public.css}">
+<link rel="stylesheet" th:href="@{/css/department.css}">
+</head>
+<body ontouchstart>
+<header class='demos-header'>
+	<h1 class="demos-title">检验报告</h1>
+</header>
+<div class="weui-form-preview">
+
+</div>
+
+	<div class="weui-msg" style="display: none" id="msg">
+		<div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+		<div class="weui-msg__text-area">
+			<h2 class="weui-msg__title">暂无数据</h2>
+			<p class="weui-msg__desc"></p>
+		</div>
+		<div class="weui-msg__opr-area">
+			<p class="weui-btn-area">
+				<a href="javascript:history.go(-1);" class="weui-btn weui-btn_default">返回</a>
+			</p>
+		</div>
+		<div class='demos-content-padded'>
+			<div class="weui-footer">
+				<p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+			</div>
+		</div>
+	</div>
+
+	<script th:src="@{/js/appjs/jquery.min.js}"></script>
+	<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+	<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+	<script th:src="@{/js/appjs/md5.js}"></script>
+	<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+	<script th:src="@{/js/appjs/public.js}"></script>
+	<script>
+    //var api_url = 'http://jdm.vipgz2.idcfengye.com';
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh',pass = 'wxgzh@dmin',key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+   
+    var zyh  = decodeURI(getQueryVariable("zyh"));//1.住院号
+    var date  = decodeURI(getQueryVariable("date"));//2.日期
+    
+    $(function(){
+		FastClick.attach(document.body);
+        $.showLoading();
+        var timeStamp = parseInt(new Date().getTime()/1000);
+        var sign = hex_md5(accountid+pass+key+timeStamp);
+        
+       
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp":timeStamp,
+            "method": 1,
+            "date":date,
+            "type":"mz",
+            "date":date
+        };
+        $.ajax({
+            url:api_url+'/hospital/lis/service.do',
+            data:JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type:'POST',
+            dataType:'json',
+            success:function (data) {
+                $.hideLoading();
+                if(data.code == 0){
+					if(data.data.length <=0){
+						$(".jqm-demos").hide();
+						$(".weui-msg__title").html("没查询到检验报告数据,请选择其他日期!");
+						$("#msg").show();
+						return;
+					}
+                	var html = '';
+                    for (var i in data.data){
+						var subHtml = '';
+						for(var y in data.data[i].reportDtail){
+							var babnormal = '';
+							if(data.data[i].reportDtail[y].babnormal=='0'){
+								babnormal = '未判别';
+							}
+							if(data.data[i].reportDtail[y].babnormal=='1'){
+								babnormal = '正常';
+							}
+							if(data.data[i].reportDtail[y].babnormal=='2'){
+								babnormal = '偏低';
+							}
+							if(data.data[i].reportDtail[y].babnormal=='3'){
+								babnormal = '偏高';
+							}
+							subHtml += '\n' +
+									'\t\t<div class="weui-flex info-list">\n' +
+									'\t\t\t<div class="weui-flex__item"><div class="placeholder text-align-c border color-fff">'+data.data[i].reportDtail[y].sname+'</div></div>\n' +
+									'\t\t\t<div class="weui-flex__item"><div class="placeholder text-align-c border color-fff">'+data.data[i].reportDtail[y].fconc+data.data[i].reportDtail[y].sunit+'</div></div>\n' +
+									'\t\t\t<div class="weui-flex__item"><div class="placeholder text-align-c border color-fff">'+babnormal+'</div></div>\n' +
+									'\t\t\t<div class="weui-flex__item"><div class="placeholder text-align-c border color-fff">'+data.data[i].reportDtail[y].normalfr+'</div></div>\n' +
+									'\t\t</div>';
+						}
+						html += '<div class="weui-panel__bd">\n' +
+								'        <div class="weui-media-box weui-media-box_text">\n' +
+					 			'            <h4 class="weui-media-box__title">'+ data.data[i].reportDtail[0].itype +'</h4>\n' +
+								'            <p class="weui-media-box__desc lh-20">姓名:'+ data.data[i].userData.sPName +' 年龄:'+data.data[i].userData.nSAge+' 性别:'+data.data[i].userData.sSex+' </p>\n' +
+								'            <p class="weui-media-box__desc lh-20">申请单号:'+data.data[i].userData.sANo+' 床号:'+data.data[i].userData.sBedno+' 科室:'+ data.data[i].userData.dept +' </p>\n' +
+								'            <ul class="weui-media-box__info">\n' +
+								'                <li class="weui-media-box__info__meta">送检医生:'+ data.data[i].userData.sdoctor +'</li>\n' +
+								'                <li class="weui-media-box__info__meta">检验医生:'+ data.data[i].userData.tdoctor +'</li>\n' +
+								'                <li class="weui-media-box__info__meta">标本号:'+data.data[i].userData.nSID+'</li>\n' +
+								'                <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">申请时间:'+data.data[i].userData.dDate+'</li>\n' +
+								'            </ul>\n' +
+								'        </div>\n' +
+								'        <div class="weui-flex">\n' +
+								'            <div class="weui-flex__item"><div class="placeholder text-align-c border">名称</div></div>\n' +
+								'            <div class="weui-flex__item"><div class="placeholder text-align-c border">检验值</div></div>\n' +
+								'            <div class="weui-flex__item"><div class="placeholder text-align-c border">结论</div></div>\n' +
+								'            <div class="weui-flex__item"><div class="placeholder text-align-c border">正常值</div></div>\n' +
+								'        </div>\n' +subHtml+
+								'    </div>';
+                    }
+                    $(".weui-form-preview").html(html);
+                }else{
+                	 layer.open({
+                         content: data.msg
+                         ,skin: 'msg'
+                         ,time: 2 //2秒后自动关闭
+                     });
+                }
+            },
+            error:function (error) {
+                console.log(error);
+            }
+        })
+    })
+   
+    
+    
+</script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jdm.Lis.dao.LisDao">
+
+
+	
+	<!--1.查询检验报告的数量-->
+	<!-- <select id="queryReportQuntity" parameterType="java.util.Map" resultType="com.jdm.Lis.domain.Report">
+		select 
+			(select sName from dbo.SDoctor where nID = a.nSDID)sDoctor,
+			(select sName from dbo.TDoctor where nID = a.nTDID)tDoctor,
+			(select sName from dbo.Department where nID=a.nDID)dept,
+			a.* 
+		from 
+			dbo.Report a 
+		where 
+			dDate=#{date}
+			and
+		    sPID=#{patientId}
+	</select> -->
+	<!-- <select id="queryReportQuntity" parameterType="java.util.Map" resultType="com.jdm.Lis.domain.Report">
+		select 
+			(select sName from dbo.SDoctor where nID = a.nSDID)sDoctor,
+			(select sName from dbo.TDoctor where nID = a.nTDID)tDoctor,
+			(select sName from dbo.Department where nID=a.nDID)dept,
+			a.* 
+		from 
+			dbo.Report a 
+		where 
+			dDate=#{date}
+			<if test="sPName != null and sPName != ''">
+			  and
+			  sPName=#{sPName}
+			</if>
+			<if test="patientId != null and patientId != ''">
+			  and
+		      sPID=#{patientId}
+		   </if>
+		   <if test="nSAge != null and nSAge != ''">
+			  and
+		      nSAge=#{nSAge}
+		   </if>
+	</select> -->
+	
+	<!-- 获取检验项目名称 -->
+	<select id="querySName" parameterType="java.util.Map" resultType="com.jdm.Lis.domain.Report">
+		select 
+			d.sName 
+		from 
+				(select 
+					b.nITID 
+				from 
+					dbo.Result b 
+				where 
+					dDate=#{date} 
+					and 
+					nIID = #{nIID} 
+					and 
+					nSID=#{nSID} group by nITID)c,
+					dbo.IType d 
+		where c.nITID = d.nID
+	</select>
+	
+	<!-- 默认查一个月 -->
+	<select id="queryReportQuntity" parameterType="java.util.Map" resultType="com.jdm.Lis.domain.Report">
+		select 
+			(select sName from dbo.SDoctor where nID = a.nSDID)sDoctor,
+			(select sName from dbo.TDoctor where nID = a.nTDID)tDoctor,
+			(select sName from dbo.Department where nID=a.nDID)dept,
+			a.* 
+		from 
+			dbo.Report a 
+		where 
+			<if test="dateS != null and dateS != '' and dateE != null and dateE != ''">
+			  dDate BETWEEN #{dateS} and #{dateE}
+			</if>
+			<if test="sPName != null and sPName != ''">
+			  and
+			  sPName=#{sPName}
+			</if>
+			<if test="patientId != null and patientId != ''">
+			  and
+		      sPID=#{patientId}
+		   </if>
+		   <if test="nSAgeS != null and nSAgeS != '' and nSAgeE != null and nSAgeE != ''">
+			  and
+		      nSAge BETWEEN #{nSAgeS} and #{nSAgeE}
+		   </if>
+	</select>
+	<!-- 3.查询检验报告明细 -->
+	<select id="queryReportDetailList" parameterType="java.util.Map" resultType="com.jdm.Lis.domain.Report">
+		select 
+			(select sName from dbo.SDoctor where nID =#{nSDID})sDoctor,
+			(select sName from dbo.TDoctor where nID =#{nTDID})tDoctor,
+			(select sName from dbo.Department where nID =#{nDID})dept,
+			(select sName from dbo.IType where nID = a.nITID)iType,
+			a.fOD,
+			a.bCType,
+			a.fConc,
+			a.sConc,
+			a.sResult,
+			a.fCutOff,
+			a.bAbnormal,
+			a.sAbnormal,
+			b.sName,
+			b.sUnit,
+			b.fRLow,
+			fRHigh 
+		from 
+			dbo.Result a,
+			dbo.Item b 
+	  where 
+	  		a.dDate =#{dDate} 
+	  	and 
+	  		a.nIID =#{nIID} 
+	  	and 
+	  		a.nSID =#{nSID}  
+	  	and 
+	  		a.nITID=b.nTID 
+	  	and 
+	  		a.sItem = b.sItem
+	</select>
+	<!--根据日期查询检验报告  -->
+	<select id="queryReportListByDate" resultType="com.jdm.Lis.domain.Report">
+		select 
+			D.sPName,
+			D.sSex,
+			D.nSAge,
+			D.sAUnit,
+			E.sItem,
+			E.sName,
+			D.fConc,
+			E.sUnit,
+			E.fRLow,
+			E.fRHigh 
+		from 
+			  dbo.Item E,
+				(select 
+					C.nITID,
+					C.sItem,
+					C.fConc,
+					B.sPName,
+					B.sSex,
+					B.nSAge,
+					B.sAUnit 
+				from 
+				dbo.Result C,
+					(select 
+						A.dDate,
+						A.nIID,
+						A.nSID,
+						A.sPName,
+						A.sSex,
+						A.nSAge,
+						A.sAUnit 
+					 from 
+						dbo.Report A 
+					where 
+						A.dDate=#{date} 
+						and 
+						A.sANo = #{patientId})B 
+				 where 
+						B.nIID = C.nIID 
+						and 
+						B.dDate = C.dDate 
+						and B.nSID = C.nSID
+						)D 
+		where 
+			E.nTID = D.nITID 
+			and 
+			E.sItem = D.sItem
+	</select>
+	
+	
+	
+	
+</mapper>
+
+

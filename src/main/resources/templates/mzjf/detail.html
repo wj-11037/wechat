@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>缴费(处方)详情</title>
+<link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+<link rel="stylesheet"
+	th:href="@{/css/themes/default/jquery.mobile-1.4.5.min.css}">
+<link rel="stylesheet" th:href="@{/css/public.css}">
+</head>
+<body>
+	<div data-role="page" class="jqm-demos" data-quicklinks="true">
+
+		<div role="main" class="ui-content">
+			<div class="ui-body ui-corner-all">
+				<ul data-role="listview" data-count-theme="b" data-inset="true"
+					class="to-detail-head">
+					<li>明细行数 <span class="ui-li-count"></span></li>
+					<li>缴费总金额 <span class="ui-li-count"></span></li>
+				</ul>
+				<ul data-role="listview" data-count-theme="b" data-inset="true"
+					class="to-detail-body">
+
+				</ul>
+				<div class="ui-field-contain text-align-c">
+					<button onclick="doMZJF()"
+						class="show-page-loading-msg colorBtn mzjfBtn"
+						data-textonly="false" data-textvisible="false" data-msgtext=""
+						data-inline="true">确认缴费</button>
+				</div>
+			</div>
+		</div>
+		<!-- /content -->
+
+	</div>
+	<!-- /page -->
+
+
+	<script th:src="@{/js/appjs/jquery.min.js}"></script>
+	<script th:src="@{/js/appjs/jquery.mobile-1.4.5.min.js}"></script>
+	<script th:src="@{/js/appjs/md5.js}"></script>
+	<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+	<script th:src="@{/js/appjs/public.js}"></script>
+	<script>
+        var api_url = '//lxyy.bdlxyy.cn';
+        var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+		
+        //url参数
+        var myType = decodeURI(getQueryVariable("myType"));
+        var sqMzDocPatientId = decodeURI(getQueryVariable("sqMzDocPatientId"));
+        var sqMzDocPatientItemNum = decodeURI(getQueryVariable("sqMzDocPatientItemNum"));
+        
+        //获取缴费明细
+        $(function () {
+            $.mobile.loading("show");
+            var timeStamp = parseInt(new Date().getTime() / 1000);
+            var sign = hex_md5(accountid + pass + key + timeStamp);
+            var postData = {
+                "sign": sign,
+                "accountid": 1,
+                "timeStamp": timeStamp,
+                "method": 2,
+                "data":[
+                	{
+                		"myType":myType,
+                        "sqMzDocPatientId":sqMzDocPatientId,
+                        "sqMzDocPatientItemNum":sqMzDocPatientItemNum
+                	}
+                 ]
+            };
+            $.ajax({
+                url: api_url + '/hospital/mzjf/service.do',
+                data: JSON.stringify(postData),
+                contentType: "application/json;charset=utf-8",//这个参数也是header参数
+                type: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    //console.log('test-success')
+                    $.mobile.loading("hide");
+                    layer.open({
+                        content: data.msg
+                        , skin: 'msg'
+                        , time: 2 //2秒后自动关闭
+                    });
+                    if (data.code == 0) {
+                        var html ='<li>缴费总金额 <span class="ui-li-count"style="color:red">￥'+data.data.PrescriptionMoney+'元</span></li>\n'+
+                            	  '<hr/>';
+                        var detail =  '';
+                        if(data.data.Item instanceof Array){
+                        	$.each(data.data.Item, function(i, item) {
+                            	detail +=
+                            	  '<li>项目名称<span class="ui-li-count">'+item.PrescriptionBodyName+'</span></li>\n' +
+                            	  '<li>项目编码<span class="ui-li-count">'+item.PrescriptionBodyId+'</span></li>\n' +
+                            	  '<li>医生<span class="ui-li-count">'+item.Billing+'</span></li>\n' +
+                            	  '<li>执行科室<span class="ui-li-count">'+item.ExecuteDepartments+'</span></li>\n' +
+                            	  '<li>患者登记号<span class="ui-li-count">'+item.SqMzDocPatientId+'</span></li>\n' +
+                            	  '<li>套餐名称<span class="ui-li-count">'+item.CzzxkGoodsTcDes+'</span></li>\n' +
+                            	  '<li>金额<span class="ui-li-count">￥'+item.Amount+'元</span></li>\n' +
+                            	  '<li>数量<span class="ui-li-count">'+item.Quantity+'</span></li>\n'+
+                            	  '<li>单位<span class="ui-li-count">'+item.Unit+'</span></li>\n'+
+                            	  '<li>规格<span class="ui-li-count">'+item.Specification+'</span></li>\n'+
+                            	  '<hr/>';
+                            })
+                        }else{
+                           	detail =
+                           		  '<li>项目名称<span class="ui-li-count">'+item.PrescriptionBodyName+'</span></li>\n' +
+                          	  	  '<li>项目编码<span class="ui-li-count">'+item.PrescriptionBodyId+'</span></li>\n' +
+                             	  '<li>医生<span class="ui-li-count">'+item.Billing+'</span></li>\n' +
+                             	  '<li>执行科室<span class="ui-li-count">'+item.ExecuteDepartments+'</span></li>\n' +
+                             	  '<li>患者登记号<span class="ui-li-count">'+item.SqMzDocPatientId+'</span></li>\n' +
+                             	  '<li>套餐名称<span class="ui-li-count">'+item.CzzxkGoodsTcDes+'</span></li>\n' +
+                             	  '<li>金额<span class="ui-li-count">￥'+item.Amount+'元</span></li>\n' +
+                             	  '<li>数量<span class="ui-li-count">'+item.Quantity+'</span></li>\n'+
+                             	  '<li>单位<span class="ui-li-count">'+item.Unit+'</span></li>\n'+
+                             	  '<li>规格<span class="ui-li-count">'+item.Specification+'</span></li>\n'+
+                             	  '<hr/>';
+                        }
+                        $(".to-detail-body").html(detail);
+                        $(".to-detail-head").html(html);
+                        $(".to-detail-head").listview("refresh");
+                        $(".to-detail-body").listview("refresh");
+                        
+                    } else {
+                        layer.open({
+                            content: data.msg
+                            , skin: 'msg'
+                            , time: 2 //2秒后自动关闭
+                        });
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            })
+        })
+       
+      //提交门诊缴费
+      function doMZJF() {
+        $(".mzjfBtn").addClass('ui-state-disabled');
+        $.mobile.loading("show");
+        var timeStamp = parseInt(new Date().getTime() / 1000);
+        var sign = hex_md5(accountid + pass + key + timeStamp);
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp": timeStamp,
+            "method": 3,
+            "data":[
+            	{
+            		"myType":myType,
+                    "sqMzDocPatientId":sqMzDocPatientId,
+                    "sqMzDocPatientItemNum":sqMzDocPatientItemNum
+            	}
+             ]
+        };
+        $.ajax({
+            url: api_url + '/hospital/mzjf/service.do',
+            data: JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                //console.log('test-success')
+                $(".mzjfBtn").removeClass('ui-state-disabled');
+                $.mobile.loading("hide");
+                layer.open({
+                    content: data.msg
+                    , skin: 'msg'
+                    , time: 2 //2秒后自动关闭
+                });
+                if (data.code == 0) {
+                    location.href= data.url;
+                } else {
+                    layer.open({
+                        content: data.msg
+                        , skin: 'msg'
+                        , time: 2 //2秒后自动关闭
+                    });
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+    }  
+        
+    </script>
+</body>
+</html>

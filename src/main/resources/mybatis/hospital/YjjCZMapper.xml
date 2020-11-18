@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jdm.hospital.yjjcz.dao.YjjczDao">
+	<!-- 根据订单号更新微信订单信息 -->
+	<update id="updateWechatOrderInfo" parameterType="com.jdm.hospital.common.domain.WeChatOrder">
+		update wechat_order set
+			wid =#{wid},
+			pid =#{pid},
+			zyh =#{zyh},
+			sqBaId =#{sqBaId},
+			orderStatus =#{orderStatus},
+			flowNo =#{flowNo},
+			amount =#{amount},
+			name =#{name},
+			cardNo =#{cardNo},
+			idCardNo =#{idCardNo},
+			updateTime =#{updateTime}
+		 where
+		 	btype=#{btype}
+		 	and
+		 	orderCode=#{orderCode}			
+	</update>
+	
+	
+	
+
+	<!-- 保存挂号信息 -->
+	<insert id="saveWeChatOrder"
+		parameterType="com.jdm.hospital.common.domain.WeChatOrder"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into wechat_order
+		(
+			wid,
+			pid,
+			btype,
+			amount,
+			name,
+			cardNo,
+			idCardNo,
+			flowNo,
+			orderCode,
+			orderStatus,
+			createTime,
+			updateTime,
+			sqBaId,
+			zyh
+		)values(
+			#{wid},
+			#{pid},
+			#{btype},
+			#{amount},
+			#{name},
+			#{cardNo},
+			#{idCardNo},
+			#{flowNo},
+			#{orderCode},
+			#{orderStatus},
+			#{createTime},
+			#{updateTime},
+			#{sqBaId},
+			#{zyh}
+		)
+	</insert>
+
+	<!-- 根据订单号+wid查询支付的订单信息 -->
+	<select id="queryWeChatOrderByOrderNoAndWid"
+		resultType="com.jdm.hospital.common.domain.WeChatOrder">
+		select
+			id,
+			wid,
+			pid,
+			btype,
+			amount,
+			name,
+			cardNo,
+			idCardNo,
+			flowNo,
+			orderCode,
+			orderStatus,
+			createTime,
+			updateTime,
+			sqBaId,
+			zyh,
+			params,
+			jfjson,
+			mzjfAmount
+		from
+			wechat_order
+		where
+			orderCode=#{orderCode}
+			and
+			wid=#{wid}
+	</select>
+
+	<!-- 支付成功修改订单状态 -->
+	<update id="updateOrderStatusByOrderNoAndWid">
+		update wechat_order set
+		orderStatus="1",
+		flowNo=#{flowNo},
+		updateTime=#{updateTime}
+		where
+		orderCode=#{orderCode}
+		and
+		wid=#{wid}
+	</update>
+	
+	
+	
+</mapper>
+
+

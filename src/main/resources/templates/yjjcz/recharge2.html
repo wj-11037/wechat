@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>充值</title>
+    <link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+    <script type="text/javascript" charset="UTF-8" src="//res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+</head>
+<body ontouchstart>
+
+<header class='demos-header'>
+    <h1 class="demos-title">充值</h1>
+</header>
+
+<div class="weui-cells__title">该充值为预交金充值，通过微信支付，将金额充到诊疗卡，您可在个人中心查看卡余额,单笔最大金额不超过5000元。</div>
+<div class="weui-cells weui-cells_form">
+    <div class="weui-cell weui-cell_vcode">
+        <div class="weui-cell__hd">
+            <label class="weui-label">充值金额</label>
+        </div>
+        <div class="weui-cell__bd">
+            <input class="weui-input" onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''" type="number" name="amount" id="amount" value="" placeholder="请输入充值金额">
+        </div>
+        <!--<div class="weui-cell__ft">
+            <button class="weui-vcode-btn">获取验证码</button>
+        </div>-->
+    </div>
+    <div class="weui-btn-area">
+        <a class="weui-btn weui-btn_primary rechargeBtn" href="javascript:doRecharge();">确认充值</a>
+    </div>
+</div>
+<div class="weui-cells__tips"><i class="weui-icon-info-circle"></i>如遇特殊情况，充值失败，请联系医院信息科，联系电话：XXXX</div>
+
+<div class='demos-content-padded weui-footer_fixed-bottom'>
+    <div class="weui-footer">
+        <p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+    </div>
+</div>
+
+<script th:src="@{/js/appjs/lib/jquery-2.1.4.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/md5.js}"></script>
+<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+<script th:src="@{/js/appjs/public.js}"></script>
+<script>
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+    var rechargeMoney = decodeURI(getQueryVariable("rechargeMoney") || '');//需要充值的金额
+    var path = decodeURI(getQueryVariable("path"));//预支付成功后跳转的页面
+    //充值类型
+    var type = decodeURI(getQueryVariable("type"));//YJJCZ ,ZYCZ
+
+    //门诊缴费需要的参数
+    var sqMzDocPatientId = decodeURI(getQueryVariable("sqMzDocPatientId"));//
+    var sqMzDocPatientItemNum = decodeURI(getQueryVariable("sqMzDocPatientItemNum"));//
+    var myType = decodeURI(getQueryVariable("myType"));//
+    //住院充值需要的参数
+    var sqBaId = decodeURI(getQueryVariable("sqBaId"));//
+    var zyh = decodeURI(getQueryVariable("zyh"));//
+    //挂号日期
+    var condate = decodeURI(getQueryVariable("condate"));//
+    var time = decodeURI(getQueryVariable("time"));//
+
+    $(function () {
+        $("#amount").val(rechargeMoney);
+    });
+
+    function doRecharge() {
+        //测试关闭支付接口
+        //alert("测试阶段暂不支持支付功能！");
+        //return  false;
+
+        //===================================
+        var amount = $("#amount").val();
+        if (amount == '' || amount <=0 || amount > 5000 || amount == "") {
+            layer.open({
+                content: '请输入正确的充值金额'
+                , skin: 'msg'
+                , time: 2 //2秒后自动关闭
+            });
+            return false;
+        }
+        $(".rechargeBtn").addClass('weui-btn_disabled');
+        $.showLoading();
+        var timeStamp = parseInt(new Date().getTime() / 1000);
+        var sign = hex_md5(accountid + pass + key + timeStamp);
+        //type==null || type=="" || type=='undefined'
+        if (type != "ZYCZ") {
+            type = "YJJCZ";
+        }
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp": timeStamp,
+            "method": 1,
+            "amount": amount,
+            "sqBaId": sqBaId,
+            "zyh": zyh,
+            "type": type
+        };
+        $.ajax({
+            url: api_url + '/hospital/yjjcz/service.do',
+            data: JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                $(".rechargeBtn").removeClass('weui-btn_disabled');
+                $.hideLoading();
+                if (data.code == 0) {
+                    //预支付成功，发起微信支付
+                    orderCode = data.orderCode;
+                    callpay(data);
+                } else {
+                    layer.open({
+                        content: data.msg
+                        , skin: 'msg'
+                        , time: 2 //2秒后自动关闭
+                    });
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+    }
+
+    function callpay(data) {
+        if (typeof WeixinJSBridge == "undefined") {
+            if (document.addEventListener) {
+                document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+            } else if (document.attachEvent) {
+                document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+                document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+            }
+        } else {
+            onBridgeReady(data);
+        }
+    }
+
+    //调用微信JS api 支付
+    function onBridgeReady(data) {
+        WeixinJSBridge.invoke(
+            "getBrandWCPayRequest",
+            $.parseJSON(data.jsonPay),
+            function (res) {
+                console.log(res);
+                if (res.err_msg == "get_brand_wcpay_request:ok") {
+                    console.log("ok");
+                    if (path == null || path == "" || path == 'undefined') {
+                        window.location.href = api_url + "/hospital/yjjcz/transition?orderCode=" +
+                            data.orderCode + "&amount=" + data.amount;
+                    } else {
+                        if (path == "mzjf") {//1.门诊缴费
+                            window.location.href = api_url + "/hospital/" + path + "/transition?orderCode=" +
+                                data.orderCode + "&amount=" + data.amount +
+                                "&sqMzDocPatientId=" + sqMzDocPatientId +
+                                "&sqMzDocPatientItemNum=" + sqMzDocPatientItemNum +
+                                "&myType=" + myType;
+                        } else if (path == "yygh") {//2.预约挂号
+                            window.location.href = api_url + "/hospital/" + path + "/transition?orderCode=" +
+                                data.orderCode + "&amount=" + data.amount + "&condate=" + condate+"&time=" + time;
+                        } else if (path == "zycz") {//3.住院充值
+                            window.location.href = api_url + "/hospital/" + path + "/transition?orderCode=" +
+                            data.orderCode + "&amount=" + data.amount+"&zyh=" + zyh;
+                    	} else {//3.其他
+                            window.location.href = api_url + "/hospital/" + path + "/transition?orderCode=" +
+                                data.orderCode + "&amount=" + data.amount;
+                        }
+                    }
+                } else if (res.err_msg == "get_brand_wcpay_request:cancel") {
+                    alert("支付取消");
+                } else {
+                    alert("支付失败");
+                }
+            }
+        );
+    }
+
+</script>
+</body>
+</html>

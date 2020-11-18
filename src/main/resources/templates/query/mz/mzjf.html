@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>诊疗卡费用记录</title>
+<link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+<link rel="stylesheet"
+	th:href="@{/css/themes/default/jquery.mobile-1.4.5.min.css}">
+<link rel="stylesheet" th:href="@{/css/public.css}">
+<link rel="stylesheet" th:href="@{/css/iosSelect.css}">
+<link rel="stylesheet" th:href="@{/css/mzjf.css}">
+</head>
+<body>
+
+	<div data-role="page" class="jqm-demos" data-quicklinks="true">
+
+		<div role="main" class="ui-content">
+			<div class="ui-body ui-corner-all">
+				<div class="search">
+					<lable>选择查询的业务类型</lable>
+					<select id="btype" data-placeholder="请选择业务类型" class="form-control chosen-select"
+						tabindex="2">
+						<option value="">全部</option>
+						<option value="00">卡内部业务</option>
+						<option value="01">转帐门诊</option>
+						<option value="03">转账挂号</option>
+					</select>
+				<input readOnly='readOnly' data-year="" data-month="" data-date="" id="startTime" type="text"placeholder="请选择开始时间">
+				<input readOnly='readOnly' data-year="" data-month="" data-date="" id="endTime" type="text"placeholder="请选择结束时间">
+					
+					<button onclick="query()"
+						class="show-page-loading-msg colorBtn inputBtn rechargeBtn" style="background: #4da3c3;color: #fff;"
+						data-textonly="false" data-textvisible="false" data-msgtext=""
+						data-inline="true">确 认</button>
+				</div>
+				<ul data-role="listview" data-count-theme="b" data-inset="true"class="mzfy">
+					
+				</ul>
+			</div>
+		</div>
+		<!-- /content -->
+
+		<div data-role="panel" class="jqm-navmenu-panel" data-position="left"
+			data-display="overlay" data-theme="a">
+			<ul class="jqm-list ui-alt-icon ui-nodisc-icon">
+				<li data-filtertext="demos homepage" data-icon="home"><a
+					href=".././">首页</a></li>
+			</ul>
+		</div>
+		<!-- /jqm-navmenu-panel -->
+	</div>
+	<!-- /page -->
+
+	<script th:src="@{/js/appjs/jquery.min.js}"></script>
+	<script th:src="@{/js/appjs/jquery.mobile-1.4.5.min.js}"></script>
+	<script th:src="@{/js/appjs/md5.js}"></script>
+	<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+	<script th:src="@{/js/appjs/public.js}"></script>
+
+	<!-- 日期js -->
+	<script th:src="@{/js/appjs/zepto.js}"></script>
+	<script th:src="@{/js/appjs/iosSelect.js}"></script>
+	<script>
+    //var api_url = 'http://jdm.vipgz2.idcfengye.com';
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh',pass = 'wxgzh@dmin',key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+    var zyh = decodeURI(getQueryVariable("zyh"));//住院号
+
+	var selectDateDom = $('#startTime');
+	var endDateDom = $('#endTime');
+	// 初始化时间
+	var now = new Date();
+	var nowYear = now.getFullYear();
+	var nowMonth = now.getMonth() + 1;
+	var nowDate = now.getDate();
+	nowMonth = nowMonth < 10 ? '0'+nowMonth : nowMonth;
+	nowDate = nowDate < 10 ? '0'+nowDate : nowDate;
+	selectDateDom.attr('data-year', nowYear);
+	selectDateDom.attr('data-month',nowMonth );
+	selectDateDom.attr('data-date', nowDate);
+
+	endDateDom.attr('data-year', nowYear);
+	endDateDom.attr('data-month',nowMonth );
+	endDateDom.attr('data-date', nowDate);
+	//showDateDom.val(nowYear+'-'+nowMonth+'-'+nowDate+' '+'00'+':'+'00')
+	// 数据初始化
+	function formatYear (nowYear) {
+		var arr = [];
+		for (var i = nowYear - 5; i <= nowYear + 5; i++) {
+			arr.push({
+				id: i + '',
+				value: i// + '年'
+			});
+		}
+		return arr;
+	}
+	function formatMonth () {
+		var arr = [];
+		for (var i = 1; i <= 12; i++) {
+			if(i < 10){
+				i = '0'+i;
+			}
+			arr.push({
+				id: i + '',
+				value: i// + '月'
+			});
+		}
+		return arr;
+	}
+	function formatDate (count) {
+		var arr = [];
+		for (var i = 1; i <= count; i++) {
+			if(i < 10){
+				i = '0'+i;
+			}
+			arr.push({
+				id: i + '',
+				value: i// + '日'
+			});
+		}
+		return arr;
+	}
+	var yearData = function(callback) {
+		callback(formatYear(nowYear))
+	}
+	var monthData = function (year, callback) {
+		callback(formatMonth());
+	};
+	var dateData = function (year, month, callback) {
+		if (/^(01|03|05|07|08|10|12)$/.test(month)) {
+			callback(formatDate(31));
+		}
+		else if (/^(04|06|09|11)$/.test(month)) {
+			callback(formatDate(30));
+		}
+		else if (/^02$/.test(month)) {
+			if (year % 4 === 0 && year % 100 !==0 || year % 400 === 0) {
+				callback(formatDate(29));
+			}
+			else {
+				callback(formatDate(28));
+			}
+		}
+		else {
+			throw new Error('month is illegal');
+		}
+	};
+	var hourData = function(one, two, three, callback) {
+		var hours = [];
+		for (var i = 0,len = 24; i < len; i++) {
+			if(i < 10){
+				i = '0'+i;
+			}
+			hours.push({
+				id: i,
+				value: i //+ '时'
+			});
+		}
+		callback(hours);
+	};
+	var minuteData = function(one, two, three, four, callback) {
+		var minutes = [];
+		for (var i = 0, len = 60; i < len; i++) {
+			if(i < 10){
+				i = '0'+i;
+			}
+			minutes.push({
+				id: i,
+				value: i// + '分'
+			});
+		}
+		callback(minutes);
+	};
+	selectDateDom.bind('click', function () {
+		var oneLevelId = selectDateDom.attr('data-year');
+		var twoLevelId = selectDateDom.attr('data-month');
+		var threeLevelId = selectDateDom.attr('data-date');
+		//var fourLevelId = selectDateDom.attr('data-hour');
+		//var fiveLevelId = selectDateDom.attr('data-minute');
+		var iosSelect = new IosSelect(3,
+				[yearData, monthData, dateData],
+				{
+					title: '时间选择',
+					itemHeight: 35,
+					itemShowCount: 9,
+					oneLevelId: oneLevelId,
+					twoLevelId: twoLevelId,
+					threeLevelId: threeLevelId,
+					//fourLevelId: fourLevelId,
+					//fiveLevelId: fiveLevelId,
+					callback: function (selectOneObj, selectTwoObj, selectThreeObj, selectFourObj, selectFiveObj) {
+						selectDateDom.attr('data-year', selectOneObj.id);
+						selectDateDom.attr('data-month', selectTwoObj.id);
+						selectDateDom.attr('data-date', selectThreeObj.id);
+						//selectDateDom.attr('data-hour', selectFourObj.id);
+						//selectDateDom.attr('data-minute', selectFiveObj.id);
+						selectDateDom.val(selectOneObj.value + '-' + selectTwoObj.value + '-' + selectThreeObj.value);
+					}
+				});
+	});
+	endDateDom.bind('click', function () {
+		var oneLevelId = endDateDom.attr('data-year');
+		var twoLevelId = endDateDom.attr('data-month');
+		var threeLevelId = endDateDom.attr('data-date');
+		//var fourLevelId = endDateDom.attr('data-hour');
+		//var fiveLevelId = endDateDom.attr('data-minute');
+		var iosSelect = new IosSelect(3,
+				[yearData, monthData, dateData],
+				{
+					title: '时间选择',
+					itemHeight: 35,
+					itemShowCount: 9,
+					oneLevelId: oneLevelId,
+					twoLevelId: twoLevelId,
+					threeLevelId: threeLevelId,
+					//fourLevelId: fourLevelId,
+					//fiveLevelId: fiveLevelId,
+					callback: function (selectOneObj, selectTwoObj, selectThreeObj, selectFourObj, selectFiveObj) {
+						endDateDom.attr('data-year', selectOneObj.id);
+						endDateDom.attr('data-month', selectTwoObj.id);
+						endDateDom.attr('data-date', selectThreeObj.id);
+						//endDateDom.attr('data-hour', selectFourObj.id);
+						//endDateDom.attr('data-minute', selectFiveObj.id);
+						endDateDom.val(selectOneObj.value + '-' + selectTwoObj.value + '-' + selectThreeObj.value);
+					}
+				});
+	});
+
+    $(function(){
+        $.mobile.loading( "show");
+        var timeStamp = parseInt(new Date().getTime()/1000);
+        var sign = hex_md5(accountid+pass+key+timeStamp);
+        
+        
+        
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp":timeStamp,
+            "method": 2,
+            "type":"00,01,03",
+            "startDate":$('#startTime').val(),
+            "endDate":$('#endTime').val()
+        };
+        $.ajax({
+            url:api_url+'/hospital/query/service.do',
+            data:JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type:'POST',
+            dataType:'json',
+            success:function (data) {
+                $.mobile.loading( "hide");
+                if(data.code == 0){
+                	var html = '';
+                	for (var i in data.data){
+                		 html += 
+                          	'<li>序号<span class="ui-li-count">' + i + '</span></li>\n' +
+                          	'<li>事务类型 <span class="ui-li-count">' +data.data[i].CardAffairDes + '</span></li>\n' +
+                          	'<li>事务类型编码<span class="ui-li-count">' + data.data[i].CardAffairId + '</span></li>\n' +
+                          	'<li>序号<span class="ui-li-count">' + data.data[i].Num+ '</span></li>\n' +
+                          	'<li>一卡通内部号<span class="ui-li-count">' + data.data[i].CardId + '</span></li>\n' +
+                          	'<li>事务时间<span class="ui-li-count">' + data.data[i].MyDate + '</span></li>\n' +
+                          	'<li>事务金额<span class="ui-li-count">' + data.data[i].MyMoney + '</span></li>\n'+
+                          	'<hr>';              		
+                	}
+	                $(".mzfy").html(html);
+	                $(".mzfy").listview("refresh");
+                }else{
+                    layer.open({
+                        content: data.msg
+                        ,skin: 'msg'
+                        ,time: 2 //2秒后自动关闭
+                    });
+                }
+            },
+            error:function (error) {
+                console.log(error);
+            }
+        })
+    })
+   
+    
+    function query(){
+    	//00:卡内部业务,01-转帐门诊,02-转账住院,03-转账挂号,04-转账POS,05-转账病历本,
+		//06-体检卡单位存取,07-一卡通押金08	农合补偿转账09	住院结算余额转账10	一卡通押金N
+		//11-转帐,12-转帐住院被褥押金,13-微信手工,14-支付宝手工,15-支付保WM,16-微信WM,17-医保后补偿,
+		//20-医保工行,21-医保建行,22-医保农行,23-医保中行,24-医保邮政,25-医保沧行
+    	
+    	var btype=$('#btype').val();
+	    if(btype==""){
+	    	btype="00,01,03";
+	    }
+    	var timeStamp = parseInt(new Date().getTime()/1000);
+        var sign = hex_md5(accountid+pass+key+timeStamp);
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp":timeStamp,
+            "method": 2,
+            "type":btype,
+            "startDate":$('#startTime').val(),
+            "endDate":$('#endTime').val()
+        };
+        $.ajax({
+            url:api_url+'/hospital/query/service.do',
+            data:JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type:'POST',
+            dataType:'json',
+            success:function (data) {
+                console.log("data="+data);
+                if(data.code == 0){
+                	var html = '';
+                	for (var i in data.data){
+                		 html += 
+                          	'<li>序号<span class="ui-li-count">' + i + '</span></li>\n' +
+                          	'<li>事务类型 <span class="ui-li-count">' +data.data[i].CardAffairDes + '</span></li>\n' +
+                          	'<li>事务类型编码<span class="ui-li-count">' + data.data[i].CardAffairId + '</span></li>\n' +
+                          	'<li>序号<span class="ui-li-count">' + data.data[i].Num+ '</span></li>\n' +
+                          	'<li>一卡通内部号<span class="ui-li-count">' + data.data[i].CardId + '</span></li>\n' +
+                          	'<li>事务时间<span class="ui-li-count">' + data.data[i].MyDate + '</span></li>\n' +
+                          	'<li>事务金额<span class="ui-li-count">' + data.data[i].MyMoney + '</span></li>\n'+ 
+                          	'<hr>';              		
+                	}
+	                $(".mzfy").html(html);
+	                $(".mzfy").listview("refresh");
+                }else{
+                    layer.open({
+                        content: data.msg
+                        ,skin: 'msg'
+                        ,time: 2 //2秒后自动关闭
+                    });
+                }
+            },
+            error:function (error) {
+                console.log(error);
+            }
+        }) 
+    }
+</script>
+</body>
+</html>

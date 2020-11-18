@@ -1,0 +1,17 @@
+.text-align-c .colorBtn{
+	color: #fff;
+	background: #00ac9c;
+}
+.ui-body h3{text-align: center;}
+.ui-body li{
+	font-weight: bold;
+}
+.ui-body .red{
+	color: #ffa81f;
+}
+.ui-body .ui-body-b{
+	background: #fff;
+	border-color: #fff;
+	color: grey;
+	text-shadow:none;
+}

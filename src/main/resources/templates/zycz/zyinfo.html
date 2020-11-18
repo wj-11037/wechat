@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>住院基本信息</title>
+    <link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+    <link rel="stylesheet" th:href="@{/css/themes/default/jquery.mobile-1.4.5.min.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+    <link rel="stylesheet" th:href="@{/css/department.css}">
+</head>
+<body>
+
+<div data-role="page" class="jqm-demos" data-quicklinks="true">
+
+    <div role="main" class="ui-content">
+        <div class="ui-body ui-corner-all">
+            <ul data-role="listview" data-count-theme="b" data-inset="true"
+                class="to-person">
+                <li><a href="javascript:void(0);"> <img
+                        src="/img/doctor.png">
+                    <h2></h2>
+                    <p></p>
+                </a></li>
+                <li>姓名 <span class="ui-li-count"></span></li>
+                <li>卡号 <span class="ui-li-count"></span></li>
+                <li>身份证号 <span class="ui-li-count"></span></li>
+                <li>卡内部号 <span class="ui-li-count"></span></li>
+                <li class="red">余额 <span class="ui-li-count">￥0.00</span></li>
+            </ul>
+        </div>
+    </div>
+    <!-- /content -->
+
+    <div class="ui-field-contain text-align-c">
+        <button onclick="doRecharge()"
+                class="show-page-loading-msg colorBtn rechargeBtn"
+                data-textonly="false" data-textvisible="false" data-msgtext=""
+                data-inline="true">住院充值
+        </button>
+    </div>
+
+    <div data-role="panel" class="jqm-navmenu-panel" data-position="left"
+         data-display="overlay" data-theme="a">
+        <ul class="jqm-list ui-alt-icon ui-nodisc-icon">
+            <li data-filtertext="demos homepage" data-icon="home"><a
+                    href=".././">首页</a></li>
+        </ul>
+    </div>
+    <!-- /jqm-navmenu-panel -->
+</div>
+<!-- /page -->
+
+<div class="weui-msg" style="display: none" id="msg">
+    <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+    <div class="weui-msg__text-area">
+        <h2 class="weui-msg__title">暂无数据</h2>
+        <p class="weui-msg__desc"></p>
+    </div>
+    <div class="weui-msg__opr-area">
+        <p class="weui-btn-area">
+            <a href="javascript:history.go(-1);" class="weui-btn weui-btn_default">返回</a>
+        </p>
+    </div>
+    <div class='demos-content-padded'>
+        <div class="weui-footer">
+            <p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/appjs/jquery.min.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/jquery.mobile-1.4.5.min.js}"></script>
+<script th:src="@{/js/appjs/md5.js}"></script>
+<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+<script th:src="@{/js/appjs/public.js}"></script>
+<script>
+    //var api_url = 'http://jdm.vipgz2.idcfengye.com';
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+
+    var zyh = decodeURI(getQueryVariable("zyh"));//住院号
+    var sqBaId = "";//住院号内部号
+
+    $(function () {
+        $.mobile.loading("show");
+        var timeStamp = parseInt(new Date().getTime() / 1000);
+        var sign = hex_md5(accountid + pass + key + timeStamp);
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp": timeStamp,
+            "method": 2,
+            "zyh": getQueryVariable("zyh"),
+            "idNo": getQueryVariable("idNo")
+        };
+        $.ajax({
+            url: api_url + '/hospital/zycz/service.do',
+            data: JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                var mystaus = MyStatus(data.data.MyStatus);
+                $.mobile.loading("hide");
+                if (data.code == 0) {
+                    if(data.data.length <=0){
+                        $(".jqm-demos").hide();
+                        $(".weui-msg__title").html("无住院信息，请重试");
+                        $("#msg").show();
+                        return;
+                    }
+                    sqBaId = data.data.SqBaId;
+                    //0
+                    var statusTxt = '未知';
+                    if (data.data.MyStatus == 0) {
+                        statusTxt = '在院';
+                    }
+                    if (data.data.MyStatus == 1) {
+                        statusTxt = '已出院通知未出院结算';
+                    }
+                    if (data.data.MyStatus == 2) {
+                        statusTxt = '已出院结算';
+                    }
+                    if (data.data.MyStatus == 2) {
+                        statusTxt = '当日退院';
+                    }
+                    var html =
+                        '           <li>姓名<span class="ui-li-count">' + data.data.PatientName + '</span></li>\n' +
+                        '           <li>出生日期<span class="ui-li-count">' + data.data.BirthDay + '</span></li>\n' +
+                        '           <li>性别 <span class="ui-li-count">' + data.data.SexFlag + '</span></li>\n' +
+                        '           <li>在院状态 <span class="ui-li-count">' + statusTxt + '</span></li>\n' +
+                        '           <li>住院内部号 <span class="ui-li-count">' + sqBaId + '</span></li>\n' +
+                        '           <li>类型<span class="ui-li-count">' + data.data.Id_PayTypeDes + '</span></li>\n' +
+                        '           <li>总费用<span class="ui-li-count">' + data.data.CurMoney + '</span></li>\n' +
+                        '           <li>押金余额<span class="ui-li-count">' + data.data.CurPrepayLeft + '</span></li>\n' +
+                        '           <li>押金总额<span class="ui-li-count">' + data.data.CurPrepay + '</span></li>\n' +
+                        '           <li>收入院医生<span class="ui-li-count">' + data.data.SqbasOper_Des4DocIn + '</span></li>\n' +
+                        '           <li>入院日期<span class="ui-li-count">' + data.data.MyDate4In + '</span></li>\n';
+                    $(".to-person").html(html);
+                    $(".to-person").listview("refresh");
+                } else {
+                    layer.open({
+                        content: '获取住院信息数据失败!'
+                        , skin: 'msg'
+                        , time: 2 //2秒后自动关闭
+                    });
+                    //获取住院信息失败后跳到输入住院号页面
+                    location.href = api_url + "/hospital/zycz/inputzyh";
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+    })
+
+    //在院状态
+    function MyStatus(obj){
+    	console.log("0:在院 1：已出院通知未出院结算 2：已出院结算 3:当日退院="+obj);
+    	var status='';
+    	switch(obj) {
+        case 0:
+           status='在院'
+           break;
+        case 1:
+           status='已出院通知未出院结算'
+           break;
+        case 2:
+        	status='已出院结算'
+            break;
+        case 3:
+        	status='当日退院'
+            break;
+        default:
+        	status='未知'
+        	break;
+        return status;	
+       } 
+   }
+    //住院充值,跳转到输入金额的页面
+    function doRecharge() {
+        location.href = api_url + "/hospital/yjjcz/recharge?zyh=" + zyh + "&sqBaId=" + sqBaId + "&path=zycz" + "&type=ZYCZ";
+    }
+
+
+</script>
+</body>
+</html>

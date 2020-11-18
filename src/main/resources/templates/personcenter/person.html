@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>个人中心</title>
+<link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+<link rel="stylesheet" th:href="@{/css/themes/default/jquery.mobile-1.4.5.min.css}">
+<link rel="stylesheet" th:href="@{/css/public.css}">
+<link rel="stylesheet" th:href="@{/css/person.css}">
+<link rel="stylesheet" th:href="@{/css/font_1175572_osq45dwzht.css}">
+</head>
+<body>
+
+	<div data-role="page" class="jqm-demos" data-quicklinks="true">
+
+		<div role="main" class="ui-content">
+			<div class="ui-body ui-corner-all">
+				<!-- 二维码 -->
+				<div id="cardNo" style="margin-left: 38%;"></div>
+				
+				<ul data-role="listview" data-count-theme="b" data-inset="true"
+					class="to-person">
+					<li><a href="javascript:void(0);"> <img style="left: 11px;top: 9px;border-radius: 38px;"
+							src="/img/doctor.png">
+							<h2></h2>
+							<p></p>
+					</a></li>
+					<li>姓名 <span class="ui-li-count"></span></li>
+					<li>卡号 <span class="ui-li-count"></span></li>
+					<li>身份证号 <span class="ui-li-count"></span></li>
+					<li>卡内部号 <span class="ui-li-count"></span></li>
+					<li class="red">余额 <span class="ui-li-count">￥0.00</span></li>
+				</ul>
+				<div class="ui-field-contain text-align-c">
+					<button onclick="doRecharge()"
+						class="show-page-loading-msg colorBtn rechargeBtn" style="background: #4da3c3;color: #fff;"
+						data-textonly="false" data-textvisible="false" data-msgtext=""
+						data-inline="true">诊疗卡充值</button>
+				</div>
+			</div>
+		</div>
+		<!-- /content -->
+
+	</div>
+	<!-- /page -->
+	<div class="entry-button-wrap">
+		<a class="ace-link ace-link-primary entry-button">
+			<i class="aliyun-icon aliyun-icon-up_to_top go-top-btn-logo button-background" data-spm-anchor-id="5176.12825654.7y9jhqsfz.i1.3dbd2c4aDyvlea"></i>
+			<span class="button-text">首页</span>
+		</a>
+	</div>
+
+	<script th:src="@{/js/appjs/jquery.min.js}"></script>
+	<script th:src="@{/js/appjs/jquery.mobile-1.4.5.min.js}"></script>
+	<script th:src="@{/js/appjs/md5.js}"></script>
+	<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+	<script th:src="@{/js/appjs/public.js}"></script>
+	<script th:src="@{/js/appjs/JsBarcode.code128.min.js}"></script>
+	<script th:src="@{/js/appjs/qrcode.min.js}"></script>
+	<script>
+    //var api_url = 'http://jdm.vipgz2.idcfengye.com';
+    var api_url = '//lxyy.bdlxyy.cn';
+    
+    var accountid = 'wxgzh',pass = 'wxgzh@dmin',key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+   
+    $(function(){
+        $.mobile.loading( "show");
+        var timeStamp = parseInt(new Date().getTime()/1000);
+        var sign = hex_md5(accountid+pass+key+timeStamp);
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp":timeStamp,
+            "method": 1,
+        };
+        $.ajax({
+            url:api_url+'/hospital/person/service.do',
+            data:JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type:'POST',
+            dataType:'json',
+            success:function (data) {
+                $.mobile.loading( "hide");
+                if(data.code == 0){
+                   var html = '<li>'+
+                	'                <img src="'+data.data.headImgUrl+'">\n' +
+                    '                <h2>' + data.data.nickname + '</h2>\n' +
+                    '                <p>' + data.data.sex + '</p>\n'+
+                    '                <p>' + data.data.address + '</p>\n'+
+                    '           </li>\n' +
+                    '           <li>姓名 <span class="ui-li-count">' + data.data.PatientName + '</span></li>\n' +
+                    '           <li>卡号<span class="ui-li-count">' + data.data.CardNo + '</span></li>\n' +
+                    '           <li>身份证号<span class="ui-li-count">' + data.data.IDNo + '</span></li>\n' +
+                    '           <li>卡内部号<span class="ui-li-count">' + data.data.PatientID + '</span></li>\n' +
+                    '           <li class="red">余额 <span class="ui-li-count">￥'+data.data.RemainMoney+'元</span></li>';
+	                $(".to-person").html(html);
+	                //条形码
+	               /*  $("#cardNo").JsBarcode(data.data.qrCode, {
+                        width:2,// 设置条之间的宽度
+                        height:100,// 高度
+                        displayValue:true// 是否在条形码上下方显示文字
+                   }); */
+                   //二维码
+				  /* $("#cardNo").qrcode({
+			            width:100,
+			            height:100,
+			            text:data.data.qrCode
+			        }); */
+                   
+	                $(".to-person").listview("refresh");
+                }else{
+                    layer.open({
+                        content: '获取个人信息数据失败!'
+                        ,skin: 'msg'
+                        ,time: 2 //2秒后自动关闭
+                    });
+                }
+            },
+            error:function (error) {
+                console.log(error);
+            }
+        })
+		$(".ace-link").click(function () {
+			location.href = '//lxyy.bdlxyy.cn/common/index';
+		});
+    })
+    //跳转到预交金充值页面
+    function doRecharge() {
+    	location.href=api_url+"/hospital/yjjcz/recharge?type=YJJCZ";
+    }
+    
+</script>
+</body>
+</html>

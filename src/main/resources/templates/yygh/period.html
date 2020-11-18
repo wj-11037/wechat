@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>选择预约挂号时段</title>
+<link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+<link rel="stylesheet"th:href="@{/css/themes/default/jquery.mobile-1.4.5.min.css}">
+<link rel="stylesheet" th:href="@{/css/public.css}">
+	<style>
+		#btn-list button{
+			display: inline-block;
+			padding: 6px 12px;
+			margin-bottom: 0;
+			font-size: 14px;
+			font-weight: 400;
+			line-height: 1.42857143;
+			text-align: center;
+			white-space: nowrap;
+			vertical-align: middle;
+			-ms-touch-action: manipulation;
+			touch-action: manipulation;
+			cursor: pointer;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+			background-image: none;
+			border: 1px solid transparent;
+			border-radius: 4px;
+			color: #fff;
+			background-color: #5cb85c;
+			border-color: #4cae4c;
+		}
+		#btn-list button:last-child{
+			margin-left: 30px;
+		}
+		.menu-list{
+			width: 50%;
+			text-align: center;
+			float: left;
+			cursor: pointer;
+		}
+		.menu-list p{
+			padding: 0;
+			margin: 0;
+		}
+	</style>
+</head>
+<body>
+
+	<div data-role="page" class="jqm-demos" data-quicklinks="true">
+
+		<div role="main" class="ui-content">
+
+		</div>
+		<!-- /content -->
+
+		<div data-role="panel" class="jqm-navmenu-panel" data-position="left"
+			data-display="overlay" data-theme="a">
+			<ul class="jqm-list ui-alt-icon ui-nodisc-icon">
+				<li data-filtertext="demos homepage" data-icon="home"><a
+					href=".././">首页</a></li>
+			</ul>
+		</div>
+		<!-- /jqm-navmenu-panel -->
+
+	</div>
+	<!-- /page -->
+
+
+	<script th:src="@{/js/appjs/jquery.min.js}"></script>
+	<script th:src="@{/js/appjs/jquery.mobile-1.4.5.min.js}"></script>
+	<script th:src="@{/js/appjs/md5.js}"></script>
+	<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+	<script th:src="@{/js/appjs/public.js}"></script>
+	<script>
+        var api_url = '//lxyy.bdlxyy.cn';
+        var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+        
+         $(function(){
+        	//页面层-自定义
+			 $(function () {
+				 layer.open({
+					 anim: 'up'
+					 ,shade:false
+					 ,shadeClose:false
+					 ,content: '<div id="btn-list" class="ui-body ui-corner-all">'+
+									 '<div class="menu-list" onclick="chooseGhType(0);">'+
+									 	'<img src="/img/gh_now.png"><p>上午</p>'+
+									 '</div>'+
+									 '<div class="menu-list" onclick="chooseGhType(1);">'+
+									 	'<img src="/img/gh_order.png"><p>下午</p>'+
+									 '</div>'+
+								'</div>'
+				 });
+			 })
+        });
+
+        
+        function chooseGhType(obj){
+        	var period="";
+        	console.log("obj="+obj);
+        	if(obj=="0"){
+        		period="上午";
+        	}else{
+        		period="下午";
+        	}
+        	location.href= api_url+'/hospital/yygh/deptList?date='+getQueryVariable("date")+"&period="+period;
+            //location.href= api_url+'/hospital/yygh/deptList?date='+decodeURI(date);
+        }
+    </script>
+</body>
+</html>

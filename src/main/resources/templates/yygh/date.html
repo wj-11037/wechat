@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>预约挂号</title>
+    <link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+	<link rel="stylesheet" th:href="@{/css/zepto.mdater.css}">
+	
+</head>
+<body ontouchstart>
+
+<header class='demos-header'>
+    <h1 class="demos-title">预约挂号</h1>
+</header>
+
+<div class="weui-cells weui-cells_form">
+
+    <div class="weui-cell">
+        <div class="weui-cell__hd"><label for="date" class="weui-label">预约日期</label></div>
+        <div class="weui-cell__bd">
+            <input class="weui-input datepicker"  readonly="readonly" id="date" type="text" placeholder="请点击此处选择日期">
+        </div>
+    </div>
+    
+    <div class="weui-cell">
+        <div class="weui-cell__hd"><label for="date" class="weui-label">预约时段</label></div>
+        <div class="weui-cell__bd">
+            <input class="weui-input" id="times" type="text" placeholder="请点击此处选择时段">
+        </div>
+    </div>
+    
+    <div class='demos-content-padded'>
+        <a href="javascript:confirm();" class="weui-btn weui-btn_primary chooseDateBtn">确定</a>
+    </div>
+    <div class="weui-cells__tips"><i class="weui-icon-info-circle"></i>微信公众号的预约时段仅供参考，具体就诊时间以医院现场就诊情况为准!</div>
+</div>
+<div id="inline-calendar"></div>
+
+<div class='demos-content-padded weui-footer_fixed-bottom'>
+    <div class="weui-footer">
+        <p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+    </div>
+</div>
+
+<div id="picker-container"></div>
+<!-- <script th:src="@{/js/appjs/lib/jquery-2.1.4.js}"></script> -->
+<script th:src="@{/js/appjs/zepto.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/md5.js}"></script>
+<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+<script th:src="@{/js/appjs/public.js}"></script>
+
+<script th:src="@{/js/appjs/zepto.mdater.js}"></script>
+<script>
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+    var showDateDom = $('#date');
+
+    // 初始化时间
+    var timestamp = (new Date()).getTime()+3600*24*1000;
+    var now = new Date(timestamp);
+    var nowYear = now.getFullYear();
+    var nowMonth = now.getMonth() + 1;
+    var nowDate = now.getDate();
+    nowMonth = nowMonth < 10 ? '0' + nowMonth : nowMonth;
+    nowDate = nowDate < 10 ? '0' + nowDate : nowDate;
+    showDateDom.attr('data-year', nowYear);
+    showDateDom.attr('data-month', nowMonth);
+    showDateDom.attr('data-date', nowDate);
+    showDateDom.val(nowYear + '-' + nowMonth + '-' + nowDate);
+	
+	var maxTimestamp = (new Date()).getTime()+3600*24*8000;
+    var max = new Date(maxTimestamp);
+    var maxYear = max.getFullYear();
+    var maxMonth = max.getMonth() + 1;
+    var maxDate = max.getDate();
+    maxMonth = maxMonth < 10 ? '0' + maxMonth : maxMonth;
+    maxDate = maxDate < 10 ? '0' + maxDate : maxDate;
+    
+	$('#date').mdater({
+		minDate : new Date(nowYear, now.getMonth(), nowDate),
+		maxDate : new Date(maxYear, max.getMonth(), maxDate),
+	});
+    $("#times").picker({
+        cols: [
+            {
+                textAlign: 'center',
+                values: ['08:00-09:00', '09:00-10:00', '11:00-12:00', '14:00-15:00', '15:00-16:00', '16:00-17:00']
+            }
+        ],
+        onChange: function(p, v, dv) {
+            console.log(p, v, dv);
+            $("#times").val(v[dv]);
+        },
+        onClose: function(p, v, d) {
+            console.log("close");
+        }
+    });
+    $(function () {
+        FastClick.attach(document.body);
+    })
+    function confirm() {
+        var condate = $("#date").val();
+        var time = $("#times").val();
+        if(time==''){
+        	layer.open({
+                content: '请选择预约时段!'
+                , skin: 'msg'
+                , time: 3 //3秒后自动关闭
+            });
+            return false;
+        }
+        //==============明天时间=================
+        var tomorrow=new Date();//获取当前时间(没有格式化)  
+        tomorrow.setTime(tomorrow.getTime()+24*60*60*1000);
+        var year=tomorrow.getFullYear();//获取年份,四位数  
+        var month=tomorrow.getMonth()+1;//获取月份,0-11  
+        var day=tomorrow.getDate();//获取几号  
+        if(month<=9){//格式化  
+            month="0"+month;  
+        }  
+        if(day<=9){  
+            day="0"+day;  
+        }  
+        tomorrow=year+"-"+month+"-"+day; 
+        //预约挂号的日期不能比明天的日期小
+        if(condate<tomorrow){
+        	layer.open({
+                content: '预约日期不对，请重新选择预约日期!'
+                , skin: 'msg'
+                , time: 5 //2秒后自动关闭
+            });
+            return false;
+        }
+       //==============明天时间=================
+        $(".chooseDateBtn").addClass('btn_disabled');
+        $.showLoading();
+        location.href = api_url + '/hospital/yygh/deptList?condate='+condate+"&time="+time;
+    }
+</script>
+</body>
+</html>

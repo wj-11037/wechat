@@ -1,0 +1,33 @@
+/*reg form*/
+/*
+.reg .ui-field-contain label,.reg .ui-field-contain input{
+	display: inline-block;
+}
+.reg .ui-field-contain label{
+	width: 20%;
+	text-align: right;
+}
+.reg .ui-field-contain .ui-input-text{
+	width: 80%;
+	display: inline-block;
+}*/
+.about h2 {
+	text-align: center;
+}
+
+.about p {
+	text-indent: 2em;
+	padding: 0 10px;
+	text-align: left;
+}
+
+.about img {
+	max-width: 100%;
+}
+
+.swiper-slide {
+	font-size: 18px;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 10px;
+}

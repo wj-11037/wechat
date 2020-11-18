@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>就诊卡列表</title>
+    <link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+    <link rel="stylesheet" th:href="@{/css/binding.css}">
+</head>
+<body ontouchstart>
+<header class='demos-header'>
+    <h1 class="demos-title">就诊卡</h1>
+</header>
+<div class="weui-form-preview">
+
+</div>
+<div class="weui-form-preview__ft">
+    <a class="weui-form-preview__btn weui-form-preview__btn_primary" href="javascript:addCard();">添加就诊人</a>
+</div>
+
+<div class='demos-content-padded'>
+    <div class="weui-footer">
+        <p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+    </div>
+</div>
+
+<script th:src="@{/js/appjs/lib/jquery-2.1.4.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/md5.js}"></script>
+<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+<script th:src="@{/js/appjs/public.js}"></script>
+<script>
+    //var api_url = 'http://jdm.vipgz2.idcfengye.com';
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+    $(function(){
+        FastClick.attach(document.body);
+        $.showLoading();
+        var timeStamp = parseInt(new Date().getTime() / 1000);
+        var sign = hex_md5(accountid + pass + key + timeStamp);
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp": timeStamp,
+            "method": 1
+        };
+        $.ajax({
+            url: api_url + '/binding/service.do',
+            data: JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                $.hideLoading();
+                if (data.code == 0) {
+                    var html = '';
+                    $.each(data.data, function (i, item) {
+                        var isBinding = item.isBinding == "1" ? "checked" : "";
+                        html += '<div class="weui-form-preview__bd">\n' +
+                            '        <div class="weui-form-preview__item">\n' +
+                            '            <label class="weui-form-preview__label">姓名</label>\n' +
+                            '            <span class="weui-form-preview__value">'+ item.name +'</span>\n' +
+                            '        </div>\n' +
+                            '        <div class="weui-form-preview__item">\n' +
+                            '            <label class="weui-form-preview__label">诊疗卡号</label>\n' +
+                            '            <span class="weui-form-preview__value">'+ item.cardNo +'</span>\n' +
+                            '        </div>\n' +
+                            '        <div class="weui-form-preview__item">\n' +
+                            '            <label class="weui-form-preview__label">身份证号</label>\n' +
+                            '            <span class="weui-form-preview__value">'+ item.idCardNo +'</span>\n' +
+                            '        </div>\n' +
+                            '        <div class="weui-form-preview__item">\n' +
+                            '            <label class="weui-form-preview__label">默认就诊人</label>\n' +
+                            '            <span class="weui-form-preview__value"><input '+isBinding+' data-id="'+item.cardNo+'" onclick="change(\''+item.cardNo+'\')" class="weui-switch is_default-'+item.cardNo+'" type="checkbox"></span>\n' +
+                            '        </div>\n' +
+                            '    </div>';
+                    })
+                    $(".weui-form-preview").html(html);
+                } else {
+                    layer.open({
+                        content: '获取诊疗卡数据失败!'
+                        , skin: 'msg'
+                        , time: 2 //2秒后自动关闭
+                    });
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+    })
+
+    //添加新诊疗卡
+    function addCard() {
+        location.href = api_url + '/binding/add';
+    }
+    
+    
+    
+    function change(id) {
+        console.log($(".is_default-"+id).is(":checked"));
+        var isB = $(".is_default-"+id).is(":checked") ? 1 : 0;
+        if(isB){
+            $(".weui-switch").each(function (i) {
+                console.log(i);
+                if($(this).data('id') != id){
+                    $(this).attr("checked",false);
+                }
+            })
+        }
+        changeDefault(id,isB);
+    }
+    function changeDefault(id,isBinding)
+    {
+        $.showLoading();
+        var timeStamp = parseInt(new Date().getTime() / 1000);
+        var sign = hex_md5(accountid + pass + key + timeStamp);
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp": timeStamp,
+            "method": 2,
+            "cardNo":id,
+            "isBinding":isBinding
+        };
+        $.ajax({
+            url: api_url + '/binding/service.do',
+            data: JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                $.hideLoading();
+                layer.open({
+                    content: data.msg
+                    , skin: 'msg'
+                    , time: 2 //2秒后自动关闭
+                });
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+    }
+</script>
+</body>
+</html>

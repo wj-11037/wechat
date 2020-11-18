@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jdm.hospital.common.dao.CommonDao">
+	 <!-- 获取票号 -->
+	 <select id="getPiaoHao" parameterType="java.util.Map" resultType="com.jdm.hospital.gh.domain.GHInfo">
+		  select
+		   id,
+		   actionType,
+		   ghId,
+		   piaoHao,
+		   orderCode,
+		   orderStatus,
+		   amount,
+		   deptId,
+		   deptName,
+		   ghType,
+		   ghTypeId,
+		   doctorId,
+		   doctorName,
+		   period,
+		   userName,
+		   cardNo,
+		   idCardNo,
+		   condate,
+		   createTime,
+		   updateTime
+		  from
+		   gh_order
+		  where
+		   actionType=#{actionType}
+		   and
+		   deptId=#{deptId}
+		   <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+		    and
+		    createTime BETWEEN #{startTime} and #{endTime}
+		   </if>
+	 </select>
+	
+	<!--  -->
+	<update id="updateNewsbrowseNum">
+		update blog_content set browse_num = browse_num+1 where cid=#{cid}
+	</update>
+	
+	
+	<!-- 获取一条新闻记录 -->
+	<select id="getOneNews" resultType="com.jdm.hospital.common.domain.ContentDO">
+		select 
+			`cid`,
+			`title`,
+			`slug`,
+			`created`,
+			`modified`,
+			`type`,
+			`tags`,
+			`categories`,
+			`hits`,
+			`comments_num` commentsNum,
+			`allow_comment` allowComment,
+			`allow_ping` allowPing,
+			`allow_feed` allowFeed,
+			`status`,
+			`author`,
+			`content`,
+			`gtm_create` gtmCreate,
+			`gtm_modified` gtmModified,
+			`browse_num` browseNum
+		from 
+			blog_content
+        where
+        	cid =#{cid}
+        	and
+        	status =1
+	</select>
+	
+	
+	<!-- 获取所有的新闻记录 -->
+	<select id="queryAllNews" resultType="com.jdm.hospital.common.domain.ContentDO">
+		select 
+			`cid`,
+			`title`,
+			`slug`,
+			`created`,
+			`modified`,
+			`type`,
+			`tags`,
+			`categories`,
+			`hits`,
+			`comments_num` commentsNum,
+			`allow_comment` allowComment,
+			`allow_ping` allowPing,
+			`allow_feed` allowFeed,
+			`status`,
+			`author`,
+			`content`,
+			`gtm_create` gtmCreate,
+			`gtm_modified` gtmModified,
+			`browse_num` browseNum 
+		from 
+			blog_content
+        <where>  
+		  		  <if test="cid != null and cid != ''"> and cid = #{cid} </if>
+		  		  <if test="title != null and title != ''"> and title = #{title} </if>
+		  		  <if test="slug != null and slug != ''"> and slug = #{slug} </if>
+		  		  <if test="created != null and created != ''"> and created = #{created} </if>
+		  		  <if test="modified != null and modified != ''"> and modified = #{modified} </if>
+		  		  <if test="content != null and content != ''"> and content = #{content} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="tags != null and tags != ''"> and tags = #{tags} </if>
+		  		  <if test="categories != null and categories != ''"> and categories = #{categories} </if>
+		  		  <if test="hits != null and hits != ''"> and hits = #{hits} </if>
+		  		  <if test="commentsNum != null and commentsNum != ''"> and comments_num = #{commentsNum} </if>
+		  		  <if test="allowComment != null and allowComment != ''"> and allow_comment = #{allowComment} </if>
+		  		  <if test="allowPing != null and allowPing != ''"> and allow_ping = #{allowPing} </if>
+		  		  <if test="allowFeed != null and allowFeed != ''"> and allow_feed = #{allowFeed} </if>
+		  		  <if test="status != null and status != ''"> and status = #{status} </if>
+		  		  <if test="author != null and author != ''"> and author = #{author} </if>
+		  		  <if test="gtmCreate != null and gtmCreate != ''"> and gtm_create = #{gtmCreate} </if>
+		  		  <if test="gtmModified != null and gtmModified != ''"> and gtm_modified = #{gtmModified} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by cid desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit ${offset}, ${limit}
+		</if>
+	</select>
+	
+	
+	
+	<select id="queryAccountClientINFO"
+		resultType="com.jdm.hospital.common.domain.AccountClient">
+		select
+		`id`,
+		`account`,
+		`password`,
+		`key`,
+		`status`
+		from
+		accout_client
+		where
+		id = #{accountid}
+		and
+		status=0
+	</select>
+	<!--通过卡号和wid查询患者信息 -->
+	<select id="queryPatientByCardNoAndWid"
+		resultType="com.jdm.hospital.common.domain.Patient">
+		select
+			id,
+			wid,
+			userName,
+			sex,
+			birthday,
+			mobile,
+			address,
+			cardNo,
+			idCardNo,
+			patientId,
+			createTime,
+			updateTime,
+			isBinding,
+			status,
+			ageType
+		from
+			patient_user
+		where
+			wid=#{wid}
+			and
+			cardNo=#{cardNo}
+
+	</select>
+
+	<!--通过插入的患者信息返回的主键id，获取患者信息 -->
+	<select id="queryPatientByID"
+		resultType="com.jdm.hospital.common.domain.Patient">
+		select
+			id,
+			wid,
+			userName,
+			sex,
+			birthday,
+			mobile,
+			address,
+			cardNo,
+			idCardNo,
+			patientId,
+			createTime,
+			updateTime,
+			isBinding,
+			status,
+			ageType
+		from
+			patient_user
+		where
+			id=#{id}
+	</select>
+
+
+
+	<!-- 保存患者信息 -->
+	<insert id="savePatient"
+		parameterType="com.jdm.hospital.common.domain.Patient"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into patient_user
+		(
+		wid,
+		userName,
+		sex,
+		birthday,
+		mobile,
+		address,
+		cardNo,
+		idCardNo,
+		patientId,
+		createTime,
+		ageType
+		)
+		values
+		(
+		#{wid},
+		#{userName},
+		#{sex},
+		#{birthday},
+		#{mobile},
+		#{address},
+		#{cardNo},
+		#{idCardNo},
+		#{patientId},
+		#{createTime},
+		#{ageType}
+		)
+	</insert>
+	<!--保存记录 -->
+	<insert id="saveRecode"
+		parameterType="com.jdm.hospital.common.domain.Recode">
+		insert into recode
+		(
+		wid,
+		pid,
+		bType,
+		amount,
+		orderCode,
+		name,
+		cardNo,
+		idCardNo,
+		msg,
+		status,
+		createTime
+		)
+		values
+		(
+		#{wid},
+		#{pid},
+		#{bType},
+		#{amount},
+		#{orderCode},
+		#{name},
+		#{cardNo},
+		#{idCardNo},
+		#{msg},
+		#{status},
+		#{createTime}
+		)
+	</insert>
+	
+	<!--  -->
+	<select id="queryRecodeByOrderCode"
+		resultType="com.jdm.hospital.common.domain.Recode">
+		select
+			id,
+			wid,
+			pid,
+			bType,
+			amount,
+			orderCode,
+			name,
+			cardNo,
+			idCardNo,
+			msg,
+			status,
+			createTime
+		from
+			recode
+		where	
+			wid=#{wid}	
+			and
+			orderCode=#{orderCode}
+	</select>
+	
+	<!-- 查询充值记录 -->
+	<select id="queryRecode" resultType="com.jdm.hospital.common.domain.Recode">
+		select
+			id,
+			wid,
+			pid,
+			bType,
+			amount,
+			orderCode,
+			name,
+			cardNo,
+			idCardNo,
+			msg,
+			status,
+			createTime
+		from
+			recode
+		where	
+			orderCode=#{orderCode}
+	</select>
+	
+	<!-- 绑定诊疗卡查询卡号的集合 -->
+	<select id="queryPatientListByidCardAndWid" resultType="com.jdm.hospital.common.domain.Patient">
+		select 
+			id, 
+			wid,
+		 	userName,
+		  	sex,
+		  	birthday,
+		   	mobile,
+		    address,
+		    cardNo,
+			idCardNo,
+			patientId,
+			createTime,
+			updateTime,
+			isBinding,
+			status,
+			ageType
+		from 
+			patient_user 
+		where 
+			wid=#{wid} 
+			and 
+			cardNo=#{cardNo}
+	</select>
+	
+</mapper>
+
+

@@ -1,0 +1,28 @@
+body{
+	padding: 2em;
+}
+.bg-g{
+	background: #f6f6f6;
+	border-bottom: 1px solid #ddd;
+}
+.border{
+	border: 1px solid #ddd;
+}
+.weui-cells{
+	margin-top: 0;
+}
+.weui-cell{
+	background: #fff;
+	border-bottom: 1px solid #ddd;
+}
+.weui-cell p{
+	color: #000;
+	font-weight: bold;
+	font-size: 14.5px;
+}
+.weui-cell .weui-cell__ft{
+	font-size: 12.5px;
+}
+.ye p{
+	color: #ffa81f;
+}

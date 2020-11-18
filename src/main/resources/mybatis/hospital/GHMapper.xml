@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jdm.hospital.gh.dao.GHDao">
+	<!-- 保存余额不足的时候挂号信息 -->
+	<insert id="saveParams" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="id">
+		insert into wechat_order(
+				btype,
+				orderCode,
+				params,
+				createTime
+		)values(
+				#{btype},
+				#{orderCode},
+				#{params},
+				#{createTime}
+		)
+	</insert>
+	
+	<!-- 保存门诊缴费的参数 -->
+	<insert id="saveMzJfParams" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="id">
+		insert into wechat_order(
+				btype,
+				orderCode,
+				params,
+				createTime,
+				mzjfAmount,
+				jfjson
+		)values(
+				#{btype},
+				#{orderCode},
+				#{params},
+				#{createTime},
+				#{mzjfAmount},
+				#{jfjson}
+		)
+	</insert>
+	
+	<!--获取当前挂号信息 -->
+	<select id="queryGHInfoByOrderCode"
+		resultType="com.jdm.hospital.gh.domain.GHInfo">
+		select
+		id,
+		actionType,
+		ghId,
+		piaoHao,
+		orderCode,
+		orderStatus,
+		amount,
+		deptId,
+		deptName,
+		ghType,
+		ghTypeId,
+		doctorId,
+		doctorName,
+		period,
+		userName,
+		cardNo,
+		idCardNo,
+		condate,
+		createTime,
+		updateTime
+		from
+		gh_order
+		where
+		orderCode=#{orderCode}
+	</select>
+
+
+	<!-- 更新挂号信息 -->
+	<!-- <update id="updateGHInfo" parameterType="com.jdm.hospital.gh.domain.GHInfo"> 
+		update gh_order set ghId=#{ghId}, updateTime=#{updateTime} where orderCode=#{orderCode} 
+		</update> -->
+
+
+	<!-- 保存挂号信息 -->
+	<insert id="saveGHInfo"
+		parameterType="com.jdm.hospital.gh.domain.GHInfo"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into gh_order
+		(
+		actionType,
+		ghId,
+		piaoHao,
+		orderCode,
+		orderStatus,
+		amount,
+		deptId,
+		deptName,
+		ghType,
+		ghTypeId,
+		doctorId,
+		doctorName,
+		period,
+		userName,
+		cardNo,
+		idCardNo,
+		condate,
+		createTime,
+		updateTime
+		)
+		values
+		(
+		#{actionType},
+		#{ghId},
+		#{piaoHao},
+		#{orderCode},
+		#{orderStatus},
+		#{amount},
+		#{deptId},
+		#{deptName},
+		#{ghType},
+		#{ghTypeId},
+		#{doctorId},
+		#{doctorName},
+		#{period},
+		#{userName},
+		#{cardNo},
+		#{idCardNo},
+		#{condate},
+		#{createTime},
+		#{updateTime}
+		)
+	</insert>
+
+</mapper>
+
+

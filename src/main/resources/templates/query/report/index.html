@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title></title>
+<link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+<link rel="stylesheet"
+	th:href="@{/css/themes/default/jquery.mobile-1.4.5.min.css}">
+<link rel="stylesheet" th:href="@{/css/public.css}">
+<link rel="stylesheet" th:href="@{/css/department.css}">
+</head>
+<body>
+
+	<div data-role="page" class="jqm-demos" data-quicklinks="true">
+		<div role="main" class="ui-content">
+			<div class="ui-body ui-corner-all">
+				<button onclick="mzReport()">门诊</button>
+			</div>
+			<div class="ui-body ui-corner-all">
+				<button onclick="zyReport()">住院</button>
+			</div>
+		</div>
+		<!-- /content -->
+
+		<div data-role="panel" class="jqm-navmenu-panel" data-position="left"
+			data-display="overlay" data-theme="a">
+			<ul class="jqm-list ui-alt-icon ui-nodisc-icon">
+				<li data-filtertext="demos homepage" data-icon="home"><a
+					href=".././">首页</a></li>
+			</ul>
+		</div>
+		<!-- /jqm-navmenu-panel -->
+	</div>
+	<!-- /page -->
+
+	<script th:src="@{/js/appjs/jquery.min.js}"></script>
+	<script th:src="@{/js/appjs/jquery.mobile-1.4.5.min.js}"></script>
+	<script th:src="@{/js/appjs/md5.js}"></script>
+	<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+	<script th:src="@{/js/appjs/public.js}"></script>
+	<script>
+    //var api_url = 'http://jdm.vipgz2.idcfengye.com';
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh',pass = 'wxgzh@dmin',key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+   
+    //门诊检验报告
+   	function mzReport(){
+   		location.href= api_url+'/hospital/lis/chooseDate';
+   	}
+   	
+   //住院检验报告
+   	function zyReport(){
+   		location.href= api_url+'/hospital/lis/inputzyhAndDate';
+   	}
+   	
+   	
+    
+</script>
+</body>
+</html>

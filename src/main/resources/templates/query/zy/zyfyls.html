@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>住院费用流水记录</title>
+    <link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+    <link rel="stylesheet" th:href="@{/css/themes/default/jquery.mobile-1.4.5.min.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+    <link rel="stylesheet" th:href="@{/css/department.css}">
+</head>
+<body>
+
+<div data-role="page" class="jqm-demos" data-quicklinks="true">
+
+    <div role="main" class="ui-content">
+        <div class="ui-body ui-corner-all">
+            <ul data-role="listview" data-count-theme="b" data-inset="true" class="to-person">
+            </ul>
+        </div>
+    </div>
+    <!-- /content -->
+</div>
+<!-- /page -->
+
+<div class="weui-msg" style="display: none" id="msg">
+    <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+    <div class="weui-msg__text-area">
+        <h2 class="weui-msg__title">暂无数据</h2>
+        <p class="weui-msg__desc"></p>
+    </div>
+    <div class="weui-msg__opr-area">
+        <p class="weui-btn-area">
+            <a href="javascript:history.go(-1);" class="weui-btn weui-btn_default">返回</a>
+        </p>
+    </div>
+    <div class='demos-content-padded'>
+        <div class="weui-footer">
+            <p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/appjs/jquery.min.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/jquery.mobile-1.4.5.min.js}"></script>
+<script th:src="@{/js/appjs/md5.js}"></script>
+<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+<script th:src="@{/js/appjs/public.js}"></script>
+<script>
+    //var api_url = 'http://jdm.vipgz2.idcfengye.com';
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+    var zyh = decodeURI(getQueryVariable("zyh"));//住院号
+    var startDate = decodeURI(getQueryVariable("startDate"));
+    var endDate = decodeURI(getQueryVariable("endDate"));
+    
+    
+    $(function () {
+        FastClick.attach(document.body);
+        $.showLoading();
+        var timeStamp = parseInt(new Date().getTime() / 1000);
+        var sign = hex_md5(accountid + pass + key + timeStamp);
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp": timeStamp,
+            "method": 1,
+            "zyh": zyh,
+            "startDate":startDate,
+            "endDate":endDate
+        };
+        $.ajax({
+            url: api_url + '/hospital/query/service.do',
+            data: JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                $.hideLoading();
+                if (data.code == 0) {
+                    if (data.data.length <= 0) {
+                        $(".jqm-demos").hide();
+                        $(".weui-msg__title").html("未查询到相关数据!");
+                        $("#msg").show();
+                        return;
+                    }
+                    var html = '';
+                    for (var i in data.data) {
+                        html +=
+                            '<li>序号<span class="ui-li-count">' + data.data[i].Num + '</span></li>\n' +
+                            '<li>日期 <span class="ui-li-count">' + data.data[i].MyDate + '</span></li>\n' +
+                            '<li>项目名称<span class="ui-li-count">' + data.data[i].SqkGoodsDes + '</span></li>\n' +
+                            '<li>项目规格<span class="ui-li-count">' + data.data[i].Regu + '</span></li>\n' +
+                            '<li>项目金额<span class="ui-li-count">' + data.data[i].MyMoney + '</span></li>\n' +
+                            '<li>就诊科室<span class="ui-li-count">' + data.data[i].SqkSiteDes4Doc + '</span></li>\n' +
+                            '<li>执行科室<span class="ui-li-count">' + data.data[i].SqkSiteDes4Exe + '</span></li>\n' +
+                            '<li>退费金额<span class="ui-li-count">' + data.data[i].MyMoney4Tf + '</span></li>\n' +
+                            '<li>高值供应商<span class="ui-li-count">' + data.data[i].GzGys + '</span></li>\n' +
+                            '<li>高值条形码<span class="ui-li-count">' + data.data[i].GzTxm + '</span></li>\n' +
+                            '<li>是否高值<span class="ui-li-count">' + data.data[i].IsGz + '</span></li>\n' +
+                            '<hr/>';
+                    }
+                    $(".to-person").html(html);
+                    $(".to-person").listview("refresh");
+                } else {
+                    layer.open({
+                        content: data.msg
+                        , skin: 'msg'
+                        , time: 2 //2秒后自动关闭
+                    });
+                    //获取住院信息失败后跳到输入住院号页面
+                    //location.href=api_url+"/hospital/query/inputzyh";
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+    })
+
+
+</script>
+</body>
+</html>

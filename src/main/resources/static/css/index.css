@@ -1,0 +1,38 @@
+.placeholder {
+    margin: 5px;
+    padding: 0 10px;
+    background-color: #ebebeb;
+    height: 2.3em;
+    line-height: 2.3em;
+    text-align: center;
+    color: #cfcfcf;
+}
+.weui-grid{
+    padding: 10px 5px;
+}
+.weui-cells__title{
+    color: #000;
+    line-height: 25px;
+    font-weight: bold;
+}
+.weui-icon-info-mz{
+    background: url(../img/index/mz-server.png);
+    background-size: cover;
+    width: 24px;
+    height: 24px;
+    margin-right: 5px;
+}
+.weui-icon-info-zy{
+    background: url(../img/index/zy-server.png);
+    background-size: cover;
+    width: 24px;
+    height: 24px;
+    margin-right: 5px;
+}
+.weui-icon-info-my{
+    background: url(../img/index/my-server.png);
+    background-size: cover;
+    width: 24px;
+    height: 24px;
+    margin-right: 5px;
+}

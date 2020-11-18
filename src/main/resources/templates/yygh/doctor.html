@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>预约挂号确认</title>
+	<link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+	<link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+	<link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+	<link rel="stylesheet" th:href="@{/css/public.css}">
+<link rel="stylesheet" th:href="@{/css/doctor.css}">
+</head>
+<body ontouchstart>
+
+<div class="weui-panel weui-panel_access border">
+	<div class="weui-panel__bd bg-g">
+		<a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg">
+			<div class="weui-media-box__hd">
+				<img class="weui-media-box__thumb" src="/img/doctor.png" alt="" id="img">
+			</div>
+			<div class="weui-media-box__bd">
+				<h4 class="weui-media-box__title" id="name"></h4>
+				<p class="weui-media-box__desc" id="department"></p>
+				<p class="weui-media-box__desc" id="level"></p>
+			</div>
+			<span class="weui-cell__ft"></span>
+		</a>
+	</div>
+	<div class="weui-cells">
+		<a class="weui-cell" href="javascript:;">
+			<div class="weui-cell__bd">
+				<p>预约日期</p>
+			</div>
+			<div class="weui-cell__ft" id="day">
+
+			</div>
+		</a>
+		<a class="weui-cell" href="javascript:;">
+			<div class="weui-cell__bd">
+				<p>预约时间</p>
+			</div>
+			<div class="weui-cell__ft" id="o-time">
+
+			</div>
+		</a>
+<!-- 		<a class="weui-cell" href="javascript:;">
+			<div class="weui-cell__bd ye">
+				<p>挂号费用</p>
+			</div>
+			<div class="weui-cell__ft" id="gh-free">
+			</div>
+		</a>
+		<a class="weui-cell" href="javascript:;">
+			<div class="weui-cell__bd ye">
+				<p>诊察费用</p>
+			</div>
+			<div class="weui-cell__ft" id="zc-free">
+			</div>
+		</a> -->
+		<a class="weui-cell" href="javascript:;">
+			<div class="weui-cell__bd ye">
+				<p>总金额</p>
+			</div>
+			<div class="weui-cell__ft" id="amount">
+			</div>
+		</a>
+	</div>
+</div>
+<div class='demos-content-padded'>
+	<a href="javascript:doRegister();" class="weui-btn weui-btn_primary ghBtn">确认预约挂号</a>
+</div>
+
+<div class='demos-content-padded weui-footer_fixed-bottom'>
+	<div class="weui-footer">
+		<p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+	</div>
+</div>
+
+
+
+<script th:src="@{/js/appjs/lib/jquery-2.1.4.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/md5.js}"></script>
+<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+<script th:src="@{/js/appjs/public.js}"></script>
+	<script>
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+
+    //url参数
+    var time=decodeURI(getQueryVariable("time"));
+    var condate=decodeURI(getQueryVariable("condate"));
+    var DoctorId = decodeURI(getQueryVariable("DoctorId"));
+    var Departments = decodeURI(getQueryVariable("Departments"));
+    var GhType = decodeURI(getQueryVariable("GhType"));
+    var RegisteredNumber = decodeURI(getQueryVariable("RegisteredNumber"));
+    var GhTypeId = decodeURI(getQueryVariable("GhTypeId"));
+    var RegisteredAmountZcf = decodeURI(getQueryVariable("RegisteredAmountZcf"));
+    var Period = decodeURI(getQueryVariable("Period"));
+    var Doctor = decodeURI(getQueryVariable("Doctor"));
+    var DoctorNote = decodeURI(getQueryVariable("DoctorNote"));
+    var RemainingNumber = decodeURI(getQueryVariable("RemainingNumber"));
+    var RegisteredAmountGhf = decodeURI(getQueryVariable("RegisteredAmountGhf"));
+    var deptId = decodeURI(getQueryVariable("deptId"));
+    var amount = parseFloat(RegisteredAmountGhf)+parseFloat(RegisteredAmountZcf);
+    
+    
+    
+    $(function () {
+        //console.log('test-show')
+        var html = '';
+        if (Doctor == '') {
+            Doctor = '普通医生';
+        }
+        if (Period == '') {
+            Period = '白天';
+        }
+        var now = new Date();
+        var dateString = now.getFullYear();
+        if ((now.getMonth() + 1) < 10) {
+            dateString += '-0' + (now.getMonth() + 1);
+        } else {
+            dateString += '-' + (now.getMonth() + 1);
+        }
+        if (now.getDate() < 10) {
+            dateString += '-0' + now.getDate();
+        } else {
+            dateString += '-' + now.getDate();
+        }
+		$("#name").html(Doctor);
+		$("#department").html(Departments);
+		$("#level").html(GhType);
+		$("#day").html(condate);
+		$("#o-time").html(time);//展示用户选的时间
+		$("#gh-free").html('￥'+RegisteredAmountGhf+'元');
+		$("#zc-free").html('￥'+RegisteredAmountZcf+'元');
+		$("#amount").html('￥'+amount+'元');
+    })
+
+    function doRegister() {
+		$(".ghBtn").addClass('weui-btn_disabled');
+		$.showLoading();
+        var timeStamp = parseInt(new Date().getTime() / 1000);
+        var sign = hex_md5(accountid + pass + key + timeStamp);
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp": timeStamp,
+            "method": 4,
+            "condate": condate,
+            "deptId": deptId,
+            "deptName":Departments,
+            "ghType":GhType,
+            "ghTypeId":GhTypeId,
+            "doctorId":DoctorId,
+            "doctorName":decodeURI(getQueryVariable("Doctor")),
+            "period":Period,//提交预约挂号用接口返回的时段
+            "time":time,
+            "amount":amount
+        };
+        $.ajax({
+            url: api_url + '/hospital/yygh/service.do',
+            data: JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                //console.log('test-success')
+				$(".ghBtn").removeClass('weui-btn_disabled');
+				$.hideLoading();
+                layer.open({
+                    content: data.msg
+                    , skin: 'msg'
+                    , time: 2 //2秒后自动关闭
+                });
+                if (data.code == 0) {
+                    location.href= data.url
+                } else {
+                    layer.open({
+                        content: data.msg
+                        , skin: 'msg'
+                        , time: 2 //2秒后自动关闭
+                    });
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+    }
+</script>
+</body>
+</html>

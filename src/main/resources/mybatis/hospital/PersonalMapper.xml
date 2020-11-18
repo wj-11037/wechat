@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jdm.hospital.perscenter.dao.PersonalCenterDao">
+
+	<!-- 查询当前微信用户+当前患者的历史记录-->
+	<select id="queryRecodeList" resultType="com.jdm.hospital.common.domain.Recode">
+		select
+			id,
+			wid,
+			pid,
+			btype,
+			name,
+			cardNo,
+			idCardNo,
+			amount,
+			orderCode,
+			status,
+			createTime,
+			msg
+		from
+			recode
+		where
+			wid =#{wid}
+			and
+			pid	=#{pid}
+			order by createTime DESC
+	</select>
+</mapper>
+
+

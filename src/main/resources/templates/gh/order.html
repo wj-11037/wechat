@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>订单支付</title>
+<link rel="shortcut icon" th:href="@{img/favicon.ico}">
+<link rel="stylesheet"
+	th:href="@{css/themes/default/jquery.mobile-1.4.5.min.css}">
+<link rel="stylesheet" th:href="@{css/public.css}">
+<link rel="stylesheet" th:href="@{css/order.css}">
+</head>
+<body>
+
+	<div data-role="page" class="jqm-demos" data-quicklinks="true">
+
+		<!--<div data-role="header" class="jqm-header">
+        <h2>科室</h2>
+        <a th:href="@{#" data-rel="back" class="ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext ui-shadow ui-corner-all" data-role="button" role="button">Back</a>
+        <a th:href="@{#"
+           class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-right">Menu</a>
+    </div>&lt;!&ndash; /header &ndash;&gt;-->
+
+		<div role="main" class="ui-content">
+			<div class="ui-body ui-corner-all">
+				<h3>订单支付</h3>
+				<ul data-role="listview" data-count-theme="b" data-inset="true">
+					<li>卡号 <span class="ui-li-count">15769123131456321</span></li>
+					<li class="red">应付金额 <span class="ui-li-count">￥4.00</span></li>
+				</ul>
+				<fieldset data-role="controlgroup" data-iconpos="right">
+					<legend>选择支付方式</legend>
+					<input type="radio" name="radio-choice-w-6" id="radio-choice-w-6a"
+						value="1" checked="checked"><label for="radio-choice-w-6a">微信</label>
+
+				</fieldset>
+				<div class="ui-field-contain text-align-c">
+					<button class="show-page-loading-msg colorBtn bindBtn"
+						data-textonly="false" data-textvisible="false" data-msgtext=""
+						data-inline="true">确认支付</button>
+				</div>
+			</div>
+		</div>
+		<!-- /content -->
+
+
+	</div>
+	<!-- /page -->
+
+	<script th:src="@{/js/appjs/jquery.min.js}"></script>
+	<script th:src="@{/js/appjs/jquery.mobile-1.4.5.min.js}"></script>
+	<script th:src="@{/js/appjs/md5.js}"></script>
+	<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+	<script th:src="@{/js/appjs/public.js}"></script>
+	<script>
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+
+    var order_sn = decodeURI(getQueryVariable("order_sn"));
+    var amount = decodeURI(getQueryVariable("amount"));
+</script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jdm.wechat.common.dao.WxUserDao">
+
+	<!--更新微信信息 -->
+	<update id="updateWechatUserInfo"
+		parameterType="com.jdm.wechat.common.domain.WeChatUser"
+		useGeneratedKeys="true" keyProperty="id">
+		update wechat_user set
+		<if test="city != null and city != ''">
+			city = #{city} ,
+		</if>
+		<if test="province != null and province != ''">
+			province = #{province} ,
+		</if>
+		<if test="country != null and country != ''">
+			country = #{country} ,
+		</if>
+		<if test="updateTime != null and updateTime != ''">
+			updateTime = #{updateTime} ,
+		</if>
+		<if test="nickname != null and nickname != ''">
+			nickname = #{nickname} ,
+		</if>
+		<if test="headImgUrl != null and headImgUrl != ''">
+			headImgUrl = #{headImgUrl}
+		</if>
+		where
+		openid=#{openid}
+	</update>
+
+
+	<!-- 获取AccessToken -->
+	<select id="getAccessToken"
+		resultType="com.jdm.wechat.common.domain.AccessToken">
+		SELECT
+		id,
+		accesstoken,
+		updateTime
+		FROM
+		access_token
+		WHERE
+		id=1
+	</select>
+	<!-- 更新acesstoken -->
+	<update id="updateAccessToken"
+		parameterType="com.jdm.wechat.common.domain.AccessToken">
+		update access_token set
+		accesstoken=#{accesstoken},
+		updateTime=#{updateTime}
+		where
+		id=1
+	</update>
+
+
+	<!--通过id查询微信用户信息 -->
+	<select id="queryWechatUserInfoById"
+		resultType="com.jdm.wechat.common.domain.WeChatUser">
+		SELECT
+		id,
+		openid,
+		nickname,
+		sex,
+		country,
+		province,
+		city,
+		language,
+		headImgUrl,
+		createTime,
+		updateTime,
+		status
+		FROM
+		wechat_user
+		WHERE
+		id=#{id}
+	</select>
+
+	<!-- 通过openid获取微信用户信息 -->
+	<select id="queryWeChatUserByOPenid"
+		resultType="com.jdm.wechat.common.domain.WeChatUser">
+		SELECT
+		id,
+		openid,
+		nickname,
+		sex,
+		country,
+		province,
+		city,
+		language,
+		headImgUrl,
+		createTime,
+		updateTime,
+		status
+		FROM
+		wechat_user
+		WHERE
+		openid=#{openid}
+	</select>
+
+	<!--通过微信id获取患者信息 -->
+	<select id="getPatientByWid" resultType="com.jdm.hospital.common.domain.Patient">
+		SELECT
+			id,
+			wid,
+			userName,
+			sex,
+			birthday,
+			mobile,
+			address,
+			cardNo,
+			idCardNo,
+			patientId,
+			createTime,
+			updateTime,
+			status,
+			isBinding
+		FROM
+			patient_user
+		WHERE
+			wid=#{id}
+		and
+			status="1"
+		and
+			isBinding="1"
+	</select>
+
+
+
+	<!--保存微信用户信息 -->
+	<insert id="saveWechatUserInfo"
+		parameterType="com.jdm.wechat.common.domain.WeChatUser"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into wechat_user
+		(
+		openid,
+		nickname,
+		sex,
+		country,
+		province,
+		city,
+		language,
+		headImgUrl,
+		createTime,
+		updateTime,
+		status
+		)values(
+		#{openid},
+		#{nickname},
+		#{sex},
+		#{country},
+		#{province},
+		#{city},
+		#{language},
+		#{headImgUrl},
+		#{createTime},
+		#{updateTime},
+		#{status}
+		)
+
+	</insert>
+
+</mapper>
+
+

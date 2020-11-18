@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>医生详情</title>
+<link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+<link rel="stylesheet"
+	th:href="@{/css/themes/default/jquery.mobile-1.4.5.min.css}">
+<link rel="stylesheet" th:href="@{/css/public.css}">
+<link rel="stylesheet" th:href="@{/css/doctor_info.css}">
+</head>
+<body>
+
+	<div data-role="page" class="jqm-demos" data-quicklinks="true">
+
+		<!--<div data-role="header" class="jqm-header">
+        <h2>科室</h2>
+        <a href="#" data-rel="back" class="ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext ui-shadow ui-corner-all" data-role="button" role="button">Back</a>
+        <a href="#"
+           class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-right">Menu</a>
+    </div>&lt;!&ndash; /header &ndash;&gt;-->
+
+		<div role="main" class="ui-content">
+			<div class="ui-body ui-corner-all">
+				<ul data-role="listview" data-count-theme="b" data-inset="true">
+					<li><img src="/img/doctor.png">
+						<h2>赵艳云</h2>
+						<p>骨科</p>
+						<p>医师</p></li>
+					<li>就诊日期 <span class="ui-li-count">2020-01-05</span></li>
+					<li>就诊时间 <span class="ui-li-count">白天</span></li>
+					<li class="red">挂号费用 <span class="ui-li-count">￥4.00</span></li>
+				</ul>
+				<div data-role="tabs" id="tabs">
+					<div data-role="navbar">
+						<ul>
+							<li><a href="#one" data-ajax="false" class="ui-btn-active">值班表</a></li>
+							<li><a href="#two" data-ajax="false">医生简介</a></li>
+						</ul>
+					</div>
+					<div id="one" class="ui-body-d">
+						<ul data-role="listview" data-count-theme="b" data-inset="true">
+							<li><a
+								class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-clock">2020-01-15
+									周六</a></li>
+							<li><a href="#"><img src="/img/register.png" alt="reg"
+									class="ui-li-icon ui-corner-none">白天 <span
+									class="to-left">余号：1000</span> <span class="ui-li-count">￥4.00</span></a></li>
+						</ul>
+					</div>
+					<div id="two">
+						<p>我是医生</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /content -->
+
+
+	</div>
+	<!-- /page -->
+
+	<script th:src="@{/js/appjs/jquery.min.js}"></script>
+	<script th:src="@{/js/appjs/jquery.mobile-1.4.5.min.js}"></script>
+	<script th:src="@{/js/appjs/md5.js}"></script>
+	<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+	<script th:src="@{/js/appjs/public.js}"></script>
+</body>
+</html>

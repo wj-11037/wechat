@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>自助服务</title>
+    <link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+</head>
+<body ontouchstart>
+
+<div class="swiper-container">
+    <!-- Additional required wrapper -->
+    <div class="swiper-wrapper">
+        <!-- Slides -->
+        <div class="swiper-slide"><img src="/img/about/1.jpg" /></div>
+        <div class="swiper-slide"><img src="/img/about/2.jpg" /></div>
+        <div class="swiper-slide"><img src="/img/about/3.jpg" /></div>
+    </div>
+    <!-- If we need pagination -->
+    <div class="swiper-pagination"></div>
+</div>
+
+<div class="weui-cells__title"><i class="weui-icon-info-mz"></i>门诊</div>
+<div class="weui-grids">
+    <a href="//lxyy.bdlxyy.cn/hospital/gh/deptList" class="weui-grid js_grid">
+        <div class="weui-grid__icon">
+            <img src="/img/index/gh.png" alt="">
+        </div>
+        <p class="weui-grid__label">
+            挂号
+        </p>
+    </a>
+    <a href="//lxyy.bdlxyy.cn/hospital/yygh/chooseDate" class="weui-grid js_grid">
+        <div class="weui-grid__icon">
+            <img src="/img/index/order.png" alt="">
+        </div>
+        <p class="weui-grid__label">
+            预约挂号
+        </p>
+    </a>
+    <a href="//lxyy.bdlxyy.cn/hospital/yjjcz/recharge" class="weui-grid js_grid">
+        <div class="weui-grid__icon">
+            <img src="/img/index/cz.png" alt="">
+        </div>
+        <p class="weui-grid__label">
+            诊疗卡充值
+        </p>
+    </a>
+    <a href="//lxyy.bdlxyy.cn/hospital/mzjf/jfList" class="weui-grid js_grid">
+        <div class="weui-grid__icon">
+            <img src="/img/index/mzjf.png" alt="">
+        </div>
+        <p class="weui-grid__label">
+            门诊缴费
+        </p>
+    </a>
+    <a href="//lxyy.bdlxyy.cn/hospital/lis/chooseDate" class="weui-grid js_grid">
+        <div class="weui-grid__icon">
+            <img src="/img/index/jy.png" alt="">
+        </div>
+        <p class="weui-grid__label">
+            检验报告单
+        </p>
+    </a>
+    <a href="javascript:$.toast('暂未开放', 'text');" class="weui-grid js_grid">
+        <div class="weui-grid__icon">
+            <img src="/img/index/report.png" alt="">
+        </div>
+        <p class="weui-grid__label">
+            检查报告单
+        </p>
+    </a>
+   
+</div>
+<div class="weui-cells__title"><i class="weui-icon-info-zy"></i>住院</div>
+<div class="weui-grids">
+    <a href="//lxyy.bdlxyy.cn/hospital/zycz/inputzyh" class="weui-grid js_grid">
+        <div class="weui-grid__icon">
+            <img src="/img/index/zycz.png" alt="">
+        </div>
+        <p class="weui-grid__label">
+            住院充值
+        </p>
+    </a>
+    <a href="//lxyy.bdlxyy.cn/hospital/query/inputzyh" class="weui-grid js_grid">
+        <div class="weui-grid__icon">
+            <img src="/img/index/log.png" alt="">
+        </div>
+        <p class="weui-grid__label">
+            流水记录
+        </p>
+    </a>
+    <a href="//lxyy.bdlxyy.cn/hospital/lis/inputzyhAndDate" class="weui-grid js_grid">
+        <div class="weui-grid__icon">
+            <img src="/img/index/zy-jy.png" alt="">
+        </div>
+        <p class="weui-grid__label">
+            检验报告单
+        </p>
+    </a>
+</div>
+<div class="weui-cells__title"><i class="weui-icon-info-my"></i>我的</div>
+<div class="weui-grids">
+    <a href="//lxyy.bdlxyy.cn/binding/binding" class="weui-grid js_grid">
+        <div class="weui-grid__icon">
+            <img src="/img/index/log.png" alt="">
+        </div>
+        <p class="weui-grid__label">
+            绑定诊疗卡
+        </p>
+    </a>
+    <a href="//lxyy.bdlxyy.cn/hospital/person/personCenter" class="weui-grid js_grid">
+        <div class="weui-grid__icon">
+            <img src="/img/index/day.png" alt="">
+        </div>
+        <p class="weui-grid__label">
+            个人中心
+        </p>
+    </a>
+     <a href="//lxyy.bdlxyy.cn/hospital/person/recode" class="weui-grid js_grid">
+        <div class="weui-grid__icon">
+            <img src="/img/index/zy-jy.png" alt="">
+        </div>
+        <p class="weui-grid__label">
+            费用记录
+        </p>
+    </a>
+     <a href="javascript:showQrcode();" class="weui-grid js_grid">
+        <div class="weui-grid__icon">
+            <img src="/img/index/zy-jy.png" alt="">
+        </div>
+        <p class="weui-grid__label">
+            就诊码
+        </p>
+    </a>
+</div>
+<div class='demos-content-padded'>
+    <div class="weui-footer">
+        <p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+    </div>
+</div>
+<script th:src="@{/js/appjs/lib/jquery-2.1.4.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/md5.js}"></script>
+<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+<script th:src="@{/js/appjs/public.js}"></script>
+<script th:src="@{/js/appjs/js/swiper.min.js}"></script>
+<script th:src="@{/js/appjs/qrcode.min.js}"></script>
+<script>
+    //var api_url = 'http://jdm.vipgz2.idcfengye.com';
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+    function showQrcode(){
+        $.showLoading();
+        var timeStamp = parseInt(new Date().getTime() / 1000);
+        var sign = hex_md5(accountid + pass + key + timeStamp);
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp": timeStamp,
+            "method": 3
+        };
+        $.ajax({
+            url: api_url + '/qrCode/person/service.do',
+            data: JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                $.hideLoading();
+                if(data.code == 1001){
+                	layer.open({
+                        content: data.msg
+                        , skin: '您还未注册！'
+                        , time: 2 //2秒后自动关闭
+                    });
+                	setTimeout(function(){
+                		location.href=api_url+'/page/toRegist';
+                	},1000);
+                }
+                if (data.code == 0) {
+                    layer.open({
+                        title: [
+                            '就诊码',
+                            'background-color: #39bf0b; color:#fff;'
+                        ]
+                        ,content: "<div id='jz_div'></div>"
+                        ,btn: '我知道了'
+                    });
+                    $("#jz_div").qrcode({
+                        width:150,
+                        height:150,
+                        text:data.cardEwm
+                    });
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+    }
+    $(function() {
+        FastClick.attach(document.body);
+        $(".swiper-container").swiper({
+            loop: true,
+            autoplay: 3000
+        });
+    });
+</script>
+</body>
+</html>

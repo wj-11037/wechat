@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>医生列表</title>
+    <link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+    <link rel="stylesheet" th:href="@{/css/department.css}">
+</head>
+<body ontouchstart>
+
+<div class="weui-panel weui-panel_access">
+    <div class="weui-panel__bd weui-cell_access">
+
+    </div>
+</div>
+
+<div class="weui-msg" style="display: none" id="msg">
+    <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+    <div class="weui-msg__text-area">
+        <h2 class="weui-msg__title">暂无数据</h2>
+        <p class="weui-msg__desc"></p>
+    </div>
+    <div class="weui-msg__opr-area">
+        <p class="weui-btn-area">
+            <a href="javascript:history.go(-1);" class="weui-btn weui-btn_default">返回</a>
+        </p>
+    </div>
+    <div class='demos-content-padded'>
+        <div class="weui-footer">
+            <p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/appjs/lib/jquery-2.1.4.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/md5.js}"></script>
+<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+<script th:src="@{/js/appjs/public.js}"></script>
+<script>
+    //var api_url = 'http://jdm.vipgz2.idcfengye.com';
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+    var period = getQueryVariable("period");//时段
+    var time= getQueryVariable("time")
+    
+    
+    $(function () {
+        FastClick.attach(document.body);
+        console.log("time="+time)
+        $.showLoading();
+        var timeStamp = parseInt(new Date().getTime() / 1000);
+        var sign = hex_md5(accountid + pass + key + timeStamp);
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp": timeStamp,
+            "method": 2,
+            "deptId": getQueryVariable("DepartmentsID"),
+            "condate": getQueryVariable("condate"),
+            "time":time
+        };
+        $.ajax({
+            url: api_url + '/hospital/yygh/service.do',
+            data: JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                //console.log('test-success')
+                $.hideLoading();
+                if (data.code == 0) {
+                	var arr = Object.keys(data.data);
+                	if(arr.length <=0){
+                		console.log("无排班医生数据");
+                        $(".jqm-demos").hide();
+                        $(".weui-msg__title").html("无排班医生数据");
+                        $("#msg").show();
+                        return;
+                    }
+                    var html = '';
+                    for (var i in data.data) {
+                        var name = data.data[i].Doctor;
+                        if (data.data[i].Doctor.length == 0) {
+                            var name = '普通医生';
+                        }
+                        var hy;
+                        if(data.data[i].Period=="上午"){
+                        	hy=data.sw;
+                        }else{
+                        	hy=data.xw;
+                        }
+                        html += '<a href="' + api_url + '/hospital/yygh/doctorDetail?DoctorId=' + data.data[i].DoctorId +
+                            '&condate=' + getQueryVariable("condate") +
+                            '&time=' + time +
+                            '&Departments=' + data.data[i].Departments +
+                            '&GhType=' + data.data[i].GhType +
+                            '&RegisteredNumber=' + data.data[i].RegisteredNumber +
+                            '&GhTypeId=' + data.data[i].GhTypeId +
+                            '&RegisteredAmountZcf=' + data.data[i].RegisteredAmountZcf +
+                            '&Period=' + data.data[i].Period +
+                            '&Doctor=' + data.data[i].Doctor +
+                            '&DoctorNote=' + data.data[i].DoctorNote +
+                            '&RemainingNumber=' + data.data[i].RemainingNumber +
+                            '&RegisteredAmountGhf=' + data.data[i].RegisteredAmountGhf +
+                            '&deptId=' + getQueryVariable("DepartmentsID") + '" class="weui-media-box weui-media-box_appmsg">\n' +
+                            '\t\t\t<div class="weui-media-box__hd">\n' +
+                            '\t\t\t\t<img class="weui-media-box__thumb" src="/img/doctor.png" alt="">\n' +
+                            '\t\t\t</div>\n' +
+                            '\t\t\t<div class="weui-media-box__bd">\n' +
+                            '\t\t\t\t<h4 class="weui-media-box__title">' + name + '</h4>\n' +
+                            '\t\t\t\t<p class="weui-media-box__desc">' + data.data[i].GhType + '</p>\n' +
+                            '\t\t\t\t<p class="weui-media-box__desc">' + data.data[i].Period + '</p>\n' +
+                            '\t\t\t\t<p class="weui-media-box__desc">剩余号源:' + hy+'</p>\n' +
+                            '\t\t\t</div>\n' +
+                            '\t\t\t<span class="weui-cell__ft"></span>\n' +
+                            '\t\t</a>';
+                    }
+                    $(".weui-panel__bd").html(html);
+                } else {
+                    layer.open({
+                        content: '获取医生数据失败!'
+                        , skin: 'msg'
+                        , time: 2 //2秒后自动关闭
+                    });
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+    })
+</script>
+</body>
+</html>

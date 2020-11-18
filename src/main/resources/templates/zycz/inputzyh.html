@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>输入住院号</title>
+	<link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+	<link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+	<link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+	<link rel="stylesheet" th:href="@{/css/public.css}">
+</head>
+<body ontouchstart>
+
+<header class='demos-header'>
+	<h1 class="demos-title">住院号</h1>
+</header>
+
+<div class="weui-cells__title">请先输入住院号，确认住院信息无误后再进行充值,单笔最大金额不超过5000元</div>
+<div class="weui-cells weui-cells_form">
+	<div class="weui-cell weui-cell_vcode">
+		<div class="weui-cell__hd">
+			<label class="weui-label">住院号</label>
+		</div>
+		<div class="weui-cell__bd">
+			<input class="weui-input" type="number" name="zyh" id="zyh" value="" placeholder="请输入住院号">
+		</div>
+		<!--<div class="weui-cell__ft">
+            <button class="weui-vcode-btn">获取验证码</button>
+        </div>-->
+	</div>
+
+	<div class="weui-cell">
+		<div class="weui-cell__bd">
+			<input class="weui-input" type="text" name="idNo" id="idNo" value="" placeholder="请输入您的身份证号">
+		</div>
+	</div>
+	<div class="weui-btn-area">
+		<a class="weui-btn weui-btn_primary rechargeBtn" href="javascript:doInputZyh();">确 认</a>
+	</div>
+</div>
+<div class="weui-cells__tips"><i class="weui-icon-info-circle"></i>请仔细核对住院人身份信息,如因个人原因,未核实住院信息而导致充值错误，由个人负责,医院信息科电话:xxxxxx</div>
+
+<div class='demos-content-padded weui-footer_fixed-bottom'>
+	<div class="weui-footer">
+		<p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+	</div>
+</div>
+
+<script th:src="@{/js/appjs/lib/jquery-2.1.4.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/md5.js}"></script>
+<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+<script th:src="@{/js/appjs/public.js}"></script>
+	<script>
+        var api_url = '//lxyy.bdlxyy.cn';
+        var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+		
+        //
+        function doInputZyh() {
+            var zyh = $("#zyh").val();
+            var idNo = $("#idNo").val();
+            if(zyh==""){
+                layer.open({
+                    content: '请输入住院号'
+                    , skin: 'msg'
+                    , time: 2 //2秒后自动关闭
+                });
+                return false;
+            }
+
+			if(idNo == ''){
+				layer.open({
+					content: '请输入正确的身份证号'
+					, skin: 'msg'
+					, time: 2 //2秒后自动关闭
+				});
+				return false;
+			}
+           location.href= api_url+'/hospital/zycz/zyInfo?zyh='+zyh+'&idNo='+idNo;
+        }
+		$(function () {
+			FastClick.attach(document.body);
+		})
+    </script>
+</body>
+</html>

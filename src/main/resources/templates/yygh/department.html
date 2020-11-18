@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>科室</title>
+    <link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+    <link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+    <link rel="stylesheet" th:href="@{/css/department.css}">
+</head>
+<body ontouchstart>
+
+<div class="weui-cells">
+
+</div>
+
+<div class='demos-content-padded'>
+    <div class="weui-footer">
+        <p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+    </div>
+</div>
+<script th:src="@{/js/appjs/lib/jquery-2.1.4.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/md5.js}"></script>
+<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+<script th:src="@{/js/appjs/public.js}"></script>
+<script>
+    //var api_url = 'http://jdm.vipgz2.idcfengye.com';
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh', pass = 'wxgzh@dmin', key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+    var time=getQueryVariable("time");
+    
+    $(function () {
+        FastClick.attach(document.body);
+        $.showLoading();
+        var timeStamp = parseInt(new Date().getTime() / 1000);
+        var sign = hex_md5(accountid + pass + key + timeStamp);
+        var postData = {
+            "sign": sign,
+            "accountid": 1,
+            "timeStamp": timeStamp,
+            "method": 1
+        };
+
+        $.ajax({
+            url: api_url + '/hospital/yygh/service.do',
+            data: JSON.stringify(postData),
+            contentType: "application/json;charset=utf-8",//这个参数也是header参数
+            type: 'POST',
+            dataType: 'json',
+            success: function (data) {
+                $.hideLoading();
+                if (data.code == 0) {
+                    var html = '';
+                    for (var i in data.data){
+                        html += '<a class="weui-cell weui-cell_access" href="/hospital/yygh/doctorList?DepartmentsID='+$.trim(data.data[i].DepartmentsID)+'&condate='+$.trim(getQueryVariable("condate"))+'&time='+time+'">\n' +
+                            '        <div class="weui-cell__bd">\n' +
+                            '            <p>'+data.data[i].Departments+'</p>\n' +
+                            '        </div>\n' +
+                            '        <div class="weui-cell__ft">\n' +
+                            '        </div>\n' +
+                            '    </a>';
+                    }
+                    $(".weui-cells").html(html);
+                } else {
+                    layer.open({
+                        content: '获取科室数据失败!'
+                        , skin: 'msg'
+                        , time: 2 //2秒后自动关闭
+                    });
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+    })
+</script>
+</body>
+</html>

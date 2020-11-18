@@ -1,0 +1,26 @@
+/*reg form*/
+/*
+.reg .ui-field-contain label,.reg .ui-field-contain input{
+	display: inline-block;
+}
+.reg .ui-field-contain label{
+	width: 20%;
+	text-align: right;
+}
+.reg .ui-field-contain .ui-input-text{
+	width: 80%;
+	display: inline-block;
+}*/
+body {
+	
+}
+
+.ui-page-theme-a .ui-btn, .ui-btn.ui-btn-a:visited {
+	color: #fff;
+	background: #33b9ad;
+	font-weight: 700;
+}
+
+.ui-page-theme-a .ui-btn.yellow {
+	background: #fff188;
+}

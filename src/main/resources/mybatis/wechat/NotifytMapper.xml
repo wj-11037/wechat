@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jdm.wechat.pay.dao.PayNotifyDao">
+	
+		<!-- 1.根据订单号查询微信支付订单信息 -->
+		<select id="queryWechatOrderByOrderNo" resultType="com.jdm.hospital.common.domain.WeChatOrder">
+		
+			select
+				id,
+				wid,
+				pid,
+				btype,
+				amount,
+				name,
+				cardNo,
+				idCardNo,
+				flowNo,
+				orderCode,
+				orderStatus,
+				createTime,
+				updateTime,
+				sqBaId,
+				zyh,
+				params,
+				jfjson,
+				mzjfAmount
+			from
+				wechat_order
+			where
+				orderCode=#{orderNo}	
+		</select>
+		
+		<!-- 2.跟新订单状态 -->
+		<update id="updateWechatOrderStatus" parameterType="java.util.Map">
+			update wechat_order set 
+				   orderStatus="1",
+				   flowNo=#{flowNo}
+			where
+				orderCode=#{orderCode}	
+		</update>
+</mapper>
+
+

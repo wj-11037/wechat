@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>注册建档</title>
+	<link rel="shortcut icon" th:href="@{/img/favicon.ico}">
+	<link rel="stylesheet" th:href="@{/js/appjs/lib/weui.min.css}">
+	<link rel="stylesheet" th:href="@{/js/appjs/lib/jquery-weui.min.css}">
+	<link rel="stylesheet" th:href="@{/css/public.css}">
+</head>
+<body ontouchstart>
+
+<header class='demos-header'>
+	<h1 class="demos-title">注册建档</h1>
+</header>
+<div class="weui-cells__title">欢迎使用线上建档，建档后您可以在线挂号、缴费、查询报告、获得更多通知指引服务。</div>
+<div class="weui-cells weui-cells_form">
+	<!-- 成人还是儿童 -->
+    <div class="weui-cell">
+        <div class="weui-cell__hd"><label for="name" class="weui-label">年龄类型</label></div>
+        <div class="weui-cell__bd">
+            <input style="color:#1AAD19;font-weight:200;" class="weui-input" id="ageType" type="text" value="成人">
+        </div>
+    </div>
+	<div class="weui-cell">
+		<div class="weui-cell__hd"><label class="weui-label">身份证</label></div>
+		<div class="weui-cell__bd">
+			<input class="weui-input" type="text" name="idCard" id="idCard" value="" placeholder="请输入真实身份证">
+		</div>
+	</div>
+	<!-- 3.姓名 -->
+	<div class="weui-cell">
+		<div class="weui-cell__hd"><label class="weui-label">姓名</label></div>
+		<div class="weui-cell__bd">
+			<input class="weui-input" type="text" name="realName" id="realName" value="" placeholder="请输入真实姓名">
+		</div>
+	</div>
+	<!-- 4.手机号码 -->
+	<div class="weui-cell">
+		<div class="weui-cell__hd">
+			<label class="weui-label">手机号</label>
+		</div>
+		<div class="weui-cell__bd">
+			<input class="weui-input" type="tel" name="mobile" id="mobile" value="" placeholder="请输入手机号码">
+		</div>
+	</div>
+
+
+
+	<div class="weui-btn-area">
+		<a class="weui-btn weui-btn_primary bindBtn" id="showTooltips">立即注册</a>
+	</div>
+</div>
+<div class="weui-cells__tips"><i class="weui-icon-info-circle"></i>请如实填写就诊人信息，如因信息错误产生的一切后果自行承担。</div>
+
+<div class='demos-content-padded weui-footer_fixed-bottom'>
+	<div class="weui-footer">
+		<p class="weui-footer__text">Copyright © 2020-2030 蠡县医院</p>
+	</div>
+</div>
+
+
+
+<script th:src="@{/js/appjs/lib/jquery-2.1.4.js}"></script>
+<script th:src="@{/js/appjs/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/appjs/lib/fastclick.js}"></script>
+<script th:src="@{/js/appjs/md5.js}"></script>
+<script th:src="@{/js/appjs/layer_mobile/layer.js}"></script>
+<script th:src="@{/js/appjs/public.js}"></script>
+	<script>
+	 $("#ageType").picker({
+	        title: "请选择您的年龄类型",
+	        cols: [
+	            {
+	                textAlign: 'center',
+	                values: ['成人', '儿童']
+	            }
+	        ],
+	        onChange: function(p, v, dv) {
+	            console.log(p, v, dv);
+	        },
+	        onClose: function(p, v, d) {
+	            console.log("close");
+	        }
+	    });
+	
+	
+	
+    //var api_url = 'http://lxyy.bdlxyy.cn/common/service.do';
+    //var api_url = 'http://jdm.vipgz2.idcfengye.com';
+    //var api_url = 'http://lxyy.bdlxyy.cn/common/service.do';
+    var api_url = '//lxyy.bdlxyy.cn';
+    var accountid = 'wxgzh',pass = 'wxgzh@dmin',key = '88bd2fdc-388c-45bb-9654-2ffb808ef3d7';
+    $(function () {
+        $(".bindBtn").click(function () {
+            $(this).addClass('weui-btn_disabled');
+            $.showLoading();
+            var timeStamp = parseInt(new Date().getTime()/1000);
+            var sign = hex_md5(accountid+pass+key+timeStamp);
+            if($("#idCard").val() == ''){
+                layer.open({
+                    content: '请输入正确的身份证号码!'
+                    ,skin: 'msg'
+                    ,time: 2 //2秒后自动关闭
+                });
+                $.hideLoading();
+                $(this).removeClass('weui-btn_disabled');
+                return false;
+            }
+            if($("#mobile").val() == ''){
+                layer.open({
+                    content: '请输入正确的手机号码!'
+                    ,skin: 'msg'
+                    ,time: 2 //2秒后自动关闭
+                });
+				$.hideLoading();
+                $(this).removeClass('weui-btn_disabled');
+                return false;
+            }
+            if($("#realName").val() == ''){
+                layer.open({
+                    content: '请输入真实姓名!'
+                    ,skin: 'msg'
+                    ,time: 2 //2秒后自动关闭
+                });
+				$.hideLoading();
+                $(this).removeClass('weui-btn_disabled');
+                return false;
+            }
+            var data = {
+                "sign": sign,
+                "accountid": 1,
+                "timeStamp":timeStamp,
+                "method": 4,
+                "mobile": $("#mobile").val(),
+                "cardNo": $("#idCard").val(),
+				"cardNoType":"2",
+                "name":$("#realName").val(),
+                "ageType":$("#ageType").val()
+            };
+            console.log(JSON.stringify(data));
+            $.ajax({
+                url:api_url+'/common/service.do',
+                data:JSON.stringify(data),
+                contentType: "application/json;charset=utf-8",//这个参数也是header参数
+                type:'POST',
+                dataType:'json',
+                success:function (data) {
+					$.hideLoading();
+                    $(this).removeClass('weui-btn_disabled');
+                    console.log(data);
+                    layer.open({
+                        content: data.msg
+                        ,skin: 'msg'
+                        ,time: 2 //2秒后自动关闭
+                    });
+                    if(data.code == 0){
+                    	console.log("注册成功跳转data.url="+data.url);
+                    	location.href = api_url + '/common/index';
+                    }
+                },
+                error:function (error) {
+                    console.log(error);
+                }
+            })
+        })
+    })
+
+</script>
+</body>
+</html>
